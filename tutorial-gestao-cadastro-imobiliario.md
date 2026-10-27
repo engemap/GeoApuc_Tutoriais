@@ -1,5 +1,7 @@
 <p align="center">
-  <img src="./img/geoapuc.png" alt="Logo GeoAPUC" width="200" height="67"/>
+
+  <img src="./img/geoapuc.png" alt="Logo GeoAPUC" width="200" height="67"/>
+
 </p>
 
 # 🏢 Tutorial: Gestão do Cadastro Imobiliário
@@ -11,16 +13,28 @@
 ## 📑 Índice
 
 1. [Introdução](#introducao)
+
 2. [A Interface](#a-interface)
+
 3. [Camadas do Mapa](#camadas-do-mapa)
-   - [Mapa Cadastral](#mapa-cadastral)
-   - [Mapeamento Móvel](#mapeamento-movel)
-   - [Acervo Municipal](#acervo-municipal)
-   - [Aerolevantamento e Modelos do Terreno](#aerolevantamento-e-modelos-do-terreno)
+
+   - [Mapa Cadastral](#mapa-cadastral)
+
+   - [Mapeamento Móvel](#mapeamento-movel)
+
+   - [Acervo Municipal](#acervo-municipal)
+
+   - [Aerolevantamento e Modelos do Terreno](#aerolevantamento-e-modelos-do-terreno)
+
 4. [Como Visualizar as Camadas](#como-visualizar-as-camadas)
+
 5. [Gestão de Divergências Imobiliárias](#gestao-de-divergencias-imobiliarias)
+
 6. [FAQ](#faq)
+
 7. [Contato](#contato)
+
+8. Widgets
 
 ---
 
@@ -33,9 +47,13 @@ As camadas apresentam informações sobre o cadastro de lotes e edificações, o
 ### O que você vai aprender
 
 - Como navegar pela interface da aplicação.
+
 - Como utilizar os controles básicos do mapa.
+
 - Como ativar, desativar e expandir camadas.
+
 - Quais informações são representadas pelas camadas disponíveis.
+
 - Como acessar e interpretar os elementos visíveis no dashboard de divergências imobiliárias.
 
 > 💡 **Dica:** você pode navegar pelas seções deste tutorial utilizando os links do índice.
@@ -59,8 +77,11 @@ _Tela inicial da aplicação Gestão do Cadastro Imobiliário._
 Na parte superior da aplicação estão disponíveis:
 
 - **Logo GeoAPUC:** identifica a plataforma geográfica do município.
+
 - **Título da aplicação:** Gestão do Cadastro Imobiliário.
+
 - **Localizar endereço ou lugar:** campo de busca para procurar endereços ou locais no mapa.
+
 - **Ícones de ferramentas:** acesso a recursos complementares da aplicação, como listas, visualização em grade, medição e impressão.
 
 ### 3️⃣ Controles do Mapa
@@ -68,10 +89,15 @@ Na parte superior da aplicação estão disponíveis:
 Na lateral esquerda do mapa, você encontra os seguintes controles:
 
 - **Zoom in e zoom out:** aproximam ou afastam a visualização do mapa.
+
 - **Visão inicial:** retorna à extensão inicial do mapa.
+
 - **Navegação anterior e posterior:** permite retornar a uma visualização anterior ou avançar para uma visualização posterior, quando disponível.
+
 - **Orientação:** indica ou permite ajustar a orientação do mapa.
+
 - **Informações:** acesso à ferramenta representada pelo ícone de informação.
+
 - **Ferramenta com ícone de lixeira:** controle disponível na interface; sua função específica não foi confirmada neste tutorial.
 
 > 💡 **Dica:** utilize os controles de zoom para aproximar uma região e observar com mais detalhes as informações das camadas.
@@ -89,8 +115,11 @@ O painel também disponibiliza controles para acessar opções da camada e reorg
 No canto inferior esquerdo estão disponíveis os controles de escala:
 
 - **Escala predefinida:** permite selecionar uma escala para a visualização.
+
 - **Digite a escala:** campo para inserir uma escala manualmente.
+
 - **Aplicar:** aplica a escala informada.
+
 - **Barra de escala:** apresenta uma referência visual de distância no mapa.
 
 ### 6️⃣ Botão Divergências Imobiliárias
@@ -103,6 +132,100 @@ A funcionalidade é descrita em uma seção específica deste tutorial.
 
 Na parte inferior central do mapa é exibida uma barra com ícones para recursos complementares. Como as funções específicas de todos os ícones não foram confirmadas, este tutorial não atribui uma finalidade individual a cada um deles.
 
+## 🧩 Widgets <a id="widgets"></a>
+
+Esta seção apresenta os widgets disponíveis na barra inferior do mapa e explica como utilizá-los.
+
+### Gestão e Controle do Cadastro Imobiliário
+
+O widget de **Gestão e Controle do Cadastro Imobiliário** permite procurar imóveis, consultar os registros encontrados e localizar o imóvel selecionado no mapa.
+
+Painel de **Gestão e Controle do Cadastro Imobiliário**.
+
+![Painel de pesquisa cadastral](./img/9_pesquisa_cadastral.jpg)
+
+Como utilizar o widget **Gestão e Controle do Cadastro Imobiliário**:
+
+1. Clique no ícone **Gestão e Controle do Cadastro Imobiliário** na barra inferior para abrir o painel de consulta cadastral.
+2. Escolha o tipo de busca disponível, como busca por lote, endereço ou proprietário.
+3. Preencha os campos com as informações conhecidas e execute a busca.
+4. Confira os registros apresentados na tabela de resultados.
+5. Selecione o imóvel desejado e utilize a opção Ver no mapa para localizar sua posição.
+
+Resultado da busca com o imóvel localizado no mapa.
+
+![Consulta cadastral no mapa](./img/10_consulta_cadastral_mapa.jpg)
+
+### GeoAPUC 360°
+
+O widget GeoAPUC 360° permite consultar imagens panorâmicas de locais do município, complementando a visualização geográfica do mapa.
+
+![Visualização GeoAPUC 360](./img/11_geoapuc_360.jpg)
+
+Visualização panorâmica do GeoAPUC 360°.
+
+1. Clique no ícone 360° na barra inferior de ferramentas.
+2. Consulte a imagem panorâmica apresentada no painel.
+3. Utilize os controles disponíveis para explorar a visualização e, quando disponível, comparar com o Street View.
+4. Observe as coordenadas de latitude e longitude apresentadas no painel, quando disponíveis.
+   Dica: utilize a consulta cadastral para localizar um imóvel e recorra à visualização 360° para observar o local quando houver imagens disponíveis.
+
+## Localização e Consulta de Imóveis
+
+A aplicação oferece duas formas práticas para localizar imóveis e consultar suas informações no mapa: a **Barra de Busca Superior** e o widget **Central de Consultas Imobiliárias**.
+
+---
+
+### 1️⃣ Localização Rápida pela Barra Superior
+
+A barra de busca localizada no topo da tela permite encontrar rapidamente um imóvel digitando o seu código de inscrição imobiliária ou endereço.
+
+![Busca por Inscrição Imobiliária na Barra Superior](./img/12_busca_barra_superior.png)
+
+_Pesquisa de imóvel digitando a Inscrição Imobiliária no campo superior._
+
+#### Passo a passo:
+
+1. Clique no campo **Localizar endereço ou lugar** na barra superior.
+2. Digite a **Inscrição Imobiliária** desejada (ex.: `103.001.0028`).
+3. Selecione a opção correspondente exibida na lista de resultados.
+4. O mapa realizará a aproximação (_zoom_) automática, centralizando e destacando os limites do lote selecionado.
+5. Para limpar a seleção ou retornar ao mapa geral, clique no ícone **`X`** no campo de busca.
+
+> 💡 **Dica:** A aproximação automática é ideal para conferir rapidamente os limites do lote sobre a imagem de satélite e as demais camadas ativadas.
+
+---
+
+### 2️⃣ Central de Consultas Imobiliárias (Widget)
+
+Para uma pesquisa detalhada acompanhada da ficha completa do imóvel, utilize o widget **Central de Consultas Imobiliárias** disponível na barra de ferramentas.
+
+![Central de Consultas Imobiliárias](./img/13_central_consultas_imobiliarias.png)
+
+_Painel do widget Central de Consultas Imobiliárias com ficha cadastral e detalhes do lote._
+
+#### Tipos de pesquisa disponíveis:
+
+- **Pesquisar Proprietário:** consulta por nome do proprietário.
+- **Pesquisar por Bairro:** filtra imóveis pertencentes a um bairro específico.
+- **Pesquisar por Logradouro:** busca imóveis localizados em determinada rua ou avenida.
+- **Pesquisar por Quadra:** lista os lotes integrantes de uma quadra cadastral.
+- **Pesquisar por Inscrição Imobiliária:** busca direta pelo código do imóvel.
+
+#### Como realizar a consulta detalhada:
+
+1. Clique no ícone da **Central de Consultas Imobiliárias** na barra inferior do mapa.
+2. No menu lateral, escolha o tipo de pesquisa desejado (ex.: _Pesquisar por Inscrição Imobiliária_).
+3. Informe o parâmetro no campo de texto e pressione a tecla **Enter** ou clique no botão de busca.
+4. Selecione o registro desejado no resultado. O mapa destacará a localização exata do imóvel.
+5. O painel exibirá a ficha completa do imóvel, contendo:
+   - **Informações Gerais:** Inscrição, Data Cadastral, Situação (ex.: _Ativo_) e Uso.
+   - **Métricas:** Área Territorial e Área Construída.
+   - **Endereço Completo:** Logradouro, Número, Bairro e CEP.
+   - **Proprietários:** Nome, CPF/CNPJ e Percentual de posse.
+   - **Unidades do Lote:** Tabela com detalhamento de cada unidade vinculada ao lote.
+6. Se necessário, utilize os botões na parte inferior da ficha para exportar os dados nos formatos **XLS**, **CSV**, **XML** ou **PDF**.
+
 ---
 
 ## 🗺️ Camadas do Mapa <a id="camadas-do-mapa"></a>
@@ -110,8 +233,11 @@ Na parte inferior central do mapa é exibida uma barra com ícones para recursos
 A aplicação disponibiliza quatro grupos principais de camadas:
 
 1. **Mapa Cadastral**
+
 2. **Mapeamento Móvel**
+
 3. **Acervo Municipal**
+
 4. **Aerolevantamento e Modelos do Terreno**
 
 Cada grupo pode conter subcamadas. Ative apenas as informações necessárias para facilitar a leitura do mapa e evitar sobreposições excessivas.
@@ -123,6 +249,7 @@ A camada **Mapa Cadastral** apresenta a representação geográfica dos elemento
 Ela contém as seguintes subcamadas:
 
 - **Lotes:** representa os lotes que compõem o cadastro imobiliário.
+
 - **Edificações:** apresenta as edificações representadas na base geográfica.
 
 Ao ativar essas subcamadas, é possível visualizar a distribuição dos lotes e das edificações sobre a imagem de satélite.
@@ -138,6 +265,7 @@ A camada **Mapeamento Móvel** apresenta elementos geográficos relacionados ao 
 Ela contém duas subcamadas:
 
 - **Eixo do Mapeamento Móvel:** representa os eixos lineares registrados na camada.
+
 - **Pontos Mapeamento Móvel:** apresenta os pontos associados ao mapeamento móvel.
 
 Com essas subcamadas ativadas, o mapa exibe linhas e pontos distribuídos pelo território, permitindo observar a cobertura espacial dos elementos representados.
@@ -153,10 +281,15 @@ A camada **Acervo Municipal** reúne informações geográficas organizadas por 
 No painel, são apresentadas as seguintes subcamadas:
 
 - **Infraestrutura e Saneamento:** informações relacionadas à infraestrutura e ao saneamento.
+
 - **Meio Ambiente:** informações geográficas relacionadas ao meio ambiente.
+
 - **Sistema Viário e Transportes:** informações relacionadas ao sistema viário e aos transportes.
+
 - **Turismo:** informações geográficas relacionadas ao turismo.
+
 - **Urbanismo:** informações relacionadas ao urbanismo.
+
 - **Limites e Divisas Territoriais:** informações referentes aos limites e às divisões territoriais.
 
 As categorias podem ser expandidas para exibir os itens disponíveis em cada uma. A aparência do mapa varia conforme as subcamadas selecionadas.
@@ -171,14 +304,21 @@ A camada **Aerolevantamento e Modelos do Terreno** reúne produtos geográficos 
 
 Ela contém as seguintes subcamadas:
 
-| Subcamada                                    | Descrição                                                                                                            |
+| Subcamada                                    | Descrição                                                                                                            |
+
 | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| **Curvas de Nível Intermediárias**           | Linhas utilizadas para representar variações de altitude do terreno em intervalos intermediários.                    |
-| **Curvas de Nível Mestras**                  | Curvas de nível principais, utilizadas para facilitar a leitura das variações de altitude.                           |
-| **Ortofoto Colorida**                        | Imagem aérea corrigida geometricamente, apresentada em cores.                                                        |
-| **Ortofoto Infravermelha**                   | Imagem aérea que utiliza informações da faixa do infravermelho para representar a superfície.                        |
+
+| **Curvas de Nível Intermediárias**           | Linhas utilizadas para representar variações de altitude do terreno em intervalos intermediários.                    |
+
+| **Curvas de Nível Mestras**                  | Curvas de nível principais, utilizadas para facilitar a leitura das variações de altitude.                           |
+
+| **Ortofoto Colorida**                        | Imagem aérea corrigida geometricamente, apresentada em cores.                                                        |
+
+| **Ortofoto Infravermelha**                   | Imagem aérea que utiliza informações da faixa do infravermelho para representar a superfície.                        |
+
 | **Modelo Digital de Superfície MDS - LIDAR** | Modelo digital que representa as superfícies identificadas no levantamento, podendo incluir elementos acima do solo. |
-| **Modelo Digital do Terreno MDT - LIDAR**    | Modelo digital voltado à representação do terreno e de suas variações de relevo.                                     |
+
+| **Modelo Digital do Terreno MDT - LIDAR**    | Modelo digital voltado à representação do terreno e de suas variações de relevo.                                     |
 
 As subcamadas podem ser ativadas individualmente conforme o tipo de informação que se deseja visualizar. Nos exemplos a seguir, são apresentadas algumas das visualizações disponíveis.
 
@@ -213,19 +353,29 @@ _Visualização da subcamada Modelo Digital do Terreno MDT - LIDAR._
 Siga os passos abaixo para escolher quais informações serão exibidas no mapa:
 
 1. Localize o painel **Camadas**, no lado direito da tela.
+
 2. Encontre a camada que deseja visualizar.
+
 3. Marque a caixa de seleção ao lado do nome para ativá-la.
+
 4. Se houver uma seta ao lado do nome, clique nela para expandir ou recolher as subcamadas.
+
 5. Marque ou desmarque as subcamadas conforme as informações desejadas.
+
 6. Observe a atualização da visualização no mapa.
+
 7. Para facilitar a leitura, desative camadas que não sejam necessárias para a consulta atual.
 
 ### Dicas de utilização
 
 - **Visualize uma categoria por vez:** isso pode ajudar a compreender melhor os elementos exibidos.
+
 - **Utilize o zoom:** aproxime a área de interesse para observar os detalhes disponíveis.
+
 - **Confira as subcamadas:** uma camada principal pode conter diferentes tipos de informação.
+
 - **Atenção à sobreposição:** a ativação simultânea de várias camadas pode dificultar a interpretação do mapa.
+
 - **Consulte a escala:** utilize a escala do mapa como referência durante a navegação.
 
 > ⚠️ **Importante:** esta seção trata da visualização de camadas. A consulta detalhada dos imóveis é descrita na seção de Gestão de Divergências Imobiliárias.
@@ -251,8 +401,11 @@ _Visão geral do dashboard de Gestão de Divergências Imobiliárias._
 Na parte superior do dashboard são apresentados os seguintes indicadores:
 
 - **Imóveis Mapeados:** quantidade de imóveis indicada no dashboard.
+
 - **Divergência > 50 m²:** quantidade de imóveis classificados com divergência superior a 50 m².
+
 - **Divergência < 50 m²:** quantidade de imóveis classificados com divergência inferior a 50 m².
+
 - **Divergência > 50 m² (área):** área total de divergência apresentada no indicador destacado à direita.
 
 Os valores exibidos podem variar conforme os dados disponíveis na aplicação.
@@ -262,7 +415,9 @@ Os valores exibidos podem variar conforme os dados disponíveis na aplicação.
 No lado esquerdo da tela está localizado o painel **Busca**, que permite utilizar os seguintes campos para filtrar os imóveis:
 
 - **Inscrição:** filtra os imóveis pela inscrição imobiliária.
+
 - **Bairro:** permite selecionar um ou mais bairros.
+
 - **Proprietário:** permite selecionar o proprietário desejado.
 
 Após definir os critérios, clique em **Aplicar** para executar a busca. O botão **Cancelar** também está disponível no painel.
@@ -278,6 +433,7 @@ O usuário pode informar o valor desejado no campo **Divergência % é maior que
 O painel **Filtros** apresenta critérios complementares para refinar a visualização:
 
 - **Situação:** permite selecionar uma ou mais situações cadastrais.
+
 - **Divergência em m²:** permite informar um intervalo de valores de divergência em metros quadrados.
 
 Outros filtros podem estar disponíveis na parte inferior do painel, conforme a configuração da aplicação.
@@ -295,9 +451,13 @@ No lado direito da tela, o painel de detalhes apresenta informações referentes
 Entre os dados visíveis estão:
 
 - **Análise tributária:** diferença apurada, situação e divergência percentual.
+
 - **Área Tributária BD Prefeitura:** área tributária apresentada no painel.
+
 - **Área Total Construída:** área total construída apresentada no cadastro.
+
 - **Identificação:** inscrição, proprietário, logradouro, numeração predial e bairro.
+
 - **Informações construtivas:** dados relativos às áreas construídas, como a área de telheiro.
 
 Os campos podem apresentar valores numéricos ou informações não preenchidas, dependendo do imóvel consultado.
