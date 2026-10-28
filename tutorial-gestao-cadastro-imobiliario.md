@@ -174,10 +174,6 @@ Visualização panorâmica do GeoAPUC 360°.
 4. Observe as coordenadas de latitude e longitude apresentadas no painel, quando disponíveis.
    Dica: utilize a consulta cadastral para localizar um imóvel e recorra à visualização 360° para observar o local quando houver imagens disponíveis.
 
-## Localização e Consulta de Imóveis
-
-A aplicação oferece duas formas práticas para localizar imóveis e consultar suas informações no mapa: a **Barra de Busca Superior** e o widget **Central de Consultas Imobiliárias**.
-
 ### Exportar Memorial Descritivo
 
 O widget **Exportar Memorial Descritivo** permite gerar o memorial descritivo de um lote selecionado, incluindo a descrição perimétrica, tabela de dados técnicos e a imagem geográfica para exportação em arquivo PDF ou TXT.
@@ -200,7 +196,7 @@ _Painel do widget Exportar Memorial Descritivo com busca por inscrição e pré-
 
 _Exemplo do documento PDF do Memorial Descritivo gerado pela aplicação._
 
-### 4️⃣ Emissão de Croqui
+### Emissão de Croqui
 
 O widget **Emissão de Croqui** permite consultar os pavimentos de um imóvel, visualizar o desenho esquemático do lote com suas medidas e gerar o relatório oficial de croqui em formato PDF.
 
@@ -222,6 +218,10 @@ _Painel do widget Emissão de Croqui exibindo a pesquisa por inscrição e os de
 ![Relatório PDF da Emissão de Croqui](./img/17_pdf_emissao_croqui.png)
 
 _Exemplo de relatório PDF da Emissão de Croqui gerado pela aplicação._
+
+## Localização e Consulta de Imóveis
+
+A aplicação oferece duas formas práticas para localizar imóveis e consultar suas informações no mapa: a **Barra de Busca Superior** e o widget **Central de Consultas Imobiliárias**.
 
 ---
 
