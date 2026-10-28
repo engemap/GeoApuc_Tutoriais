@@ -1,7 +1,5 @@
 <p align="center">
-
-  <img src="./img/geoapuc.png" alt="Logo GeoAPUC" width="200" height="67"/>
-
+  <img src="./img/geoapuc.png" alt="Logo GeoAPUC" width="200" height="67"/>
 </p>
 
 # 🏢 Tutorial: Gestão do Cadastro Imobiliário
