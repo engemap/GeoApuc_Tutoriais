@@ -1,7 +1,5 @@
 <p align="center">
-
-  <img src="./img/geoapuc.png" alt="Logo GeoAPUC" width="200" height="67"/>
-
+  <img src="./img/geoapuc.png" alt="Logo GeoAPUC" width="200" height="67"/>
 </p>
 
 # 🏢 Tutorial: Gestão do Cadastro Imobiliário
@@ -16,25 +14,29 @@
 
 2. [A Interface](#a-interface)
 
-3. [Camadas do Mapa](#camadas-do-mapa)
+3. [Widgets](#widgets)
 
-   - [Mapa Cadastral](#mapa-cadastral)
+4. [Camadas do Mapa](#camadas-do-mapa)
 
-   - [Mapeamento Móvel](#mapeamento-movel)
+<div style="margin-left: 30px;">
 
-   - [Acervo Municipal](#acervo-municipal)
+    - [Mapa Cadastral](#mapa-cadastral)
 
-   - [Aerolevantamento e Modelos do Terreno](#aerolevantamento-e-modelos-do-terreno)
+    - [Mapeamento Móvel](#mapeamento-movel)
 
-4. [Como Visualizar as Camadas](#como-visualizar-as-camadas)
+    - [Acervo Municipal](#acervo-municipal)
 
-5. [Gestão de Divergências Imobiliárias](#gestao-de-divergencias-imobiliarias)
+    - [Aerolevantamento e Modelos do Terreno](#aerolevantamento-e-modelos-do-terreno)
 
-6. [FAQ](#faq)
+</div>
 
-7. [Contato](#contato)
+5. [Como Visualizar as Camadas](#como-visualizar-as-camadas)
 
-8. Widgets
+6. [Gestão de Divergências Imobiliárias](#gestao-de-divergencias-imobiliarias)
+
+7. [FAQ](#faq)
+
+8. [Contato](#contato)
 
 ---
 
@@ -142,7 +144,7 @@ O widget de **Gestão e Controle do Cadastro Imobiliário** permite procurar im�
 
 Painel de **Gestão e Controle do Cadastro Imobiliário**.
 
-![Painel de pesquisa cadastral](./img/9_pesquisa_cadastral.jpg)
+![Painel de pesquisa cadastral](./img/9_pesquisa_cadastral.png)
 
 Como utilizar o widget **Gestão e Controle do Cadastro Imobiliário**:
 
@@ -154,13 +156,13 @@ Como utilizar o widget **Gestão e Controle do Cadastro Imobiliário**:
 
 Resultado da busca com o imóvel localizado no mapa.
 
-![Consulta cadastral no mapa](./img/10_consulta_cadastral_mapa.jpg)
+![Consulta cadastral no mapa](./img/10_consulta_cadastral_mapa.png)
 
 ### GeoAPUC 360°
 
 O widget GeoAPUC 360° permite consultar imagens panorâmicas de locais do município, complementando a visualização geográfica do mapa.
 
-![Visualização GeoAPUC 360](./img/11_geoapuc_360.jpg)
+![Visualização GeoAPUC 360](./img/11_geoapuc_360.png)
 
 Visualização panorâmica do GeoAPUC 360°.
 
@@ -169,6 +171,51 @@ Visualização panorâmica do GeoAPUC 360°.
 3. Utilize os controles disponíveis para explorar a visualização e, quando disponível, comparar com o Street View.
 4. Observe as coordenadas de latitude e longitude apresentadas no painel, quando disponíveis.
    Dica: utilize a consulta cadastral para localizar um imóvel e recorra à visualização 360° para observar o local quando houver imagens disponíveis.
+
+### Exportar Memorial Descritivo
+
+O widget **Exportar Memorial Descritivo** permite gerar o memorial descritivo de um lote selecionado, incluindo a descrição perimétrica, tabela de dados técnicos e a imagem geográfica para exportação em arquivo PDF ou TXT.
+
+![Painel do widget Exportar Memorial Descritivo](./img/14_exportar_memorial_descritivo.png)
+
+_Painel do widget Exportar Memorial Descritivo com busca por inscrição e pré-visualização do texto._
+
+#### Como utilizar o widget Exportar Memorial Descritivo:
+
+1. Clique no ícone **Exportar Memorial Descritivo** na barra de ferramentas inferior para abrir o painel.
+2. No campo **Inscrição Cadastral**, digite a inscrição do imóvel desejado (ex.: `111.199.0120`) e selecione o resultado correspondente.
+3. O sistema realizará o zoom no mapa e exibirá a **Prévia do Memorial**, contendo a descrição técnica e as coordenadas dos pontos do lote.
+4. Para incluir a imagem do mapa no relatório PDF, acesse a aba **Capturar Imagem**, ajuste o enquadramento se necessário e clique em **Capturar**.
+5. Retorne à aba **Relatório** e selecione a opção de exportação desejada:
+   - **Exportar PDF:** gera o arquivo PDF completo contendo o cabeçalho oficial, descrição do perímetro, tabela de dados técnicos (vértices, coordenadas, distâncias, azimutes e confrontantes) e a imagem do lote com geolocalização.
+   - **Exportar TXT:** exporta a descrição em formato de texto simples.
+
+![Memorial Descritivo gerado em PDF](./img/15_pdf_memorial_descritivo.png)
+
+_Exemplo do documento PDF do Memorial Descritivo gerado pela aplicação._
+
+### Emissão de Croqui
+
+O widget **Emissão de Croqui** permite consultar os pavimentos de um imóvel, visualizar o desenho esquemático do lote com suas medidas e gerar o relatório oficial de croqui em formato PDF.
+
+![Painel do widget Emissão de Croqui](./img/16_emissao_croqui.png)
+
+_Painel do widget Emissão de Croqui exibindo a pesquisa por inscrição e os detalhes dos pavimentos._
+
+#### Como utilizar o widget Emissão de Croqui:
+
+1. Clique no ícone **Emissão de Croqui** na barra de ferramentas inferior para abrir o painel.
+2. No campo **Inscrição Cadastral**, informe a inscrição do imóvel desejado (ex.: `111.199.0120`) e confirme a seleção do imóvel encontrado.
+3. O painel exibirá o esquema do lote com o contorno da edificação e as dimensões dos pavimentos encontrados.
+4. Na seção **Pavimentos Encontrados**, consulte a lista de pavimentos cadastrados juntamente com os detalhes de **Área Total**, **Área Social** e **Área de Telheiro**.
+5. Clique no botão **Gerar relatório** na parte inferior do painel.
+6. A aplicação gerará automaticamente o arquivo PDF da **Emissão de Croqui**, contendo:
+   - **Dados Cadastrais:** Inscrição, código do imóvel, proprietário, logradouro, bairro, CEP, área territorial e área construída.
+   - **Desenho do Croqui:** Representação gráfica detalhada com as medidas perimétricas e indicação visual dos pavimentos.
+
+![Relatório PDF da Emissão de Croqui](./img/17_pdf_emissao_croqui.png)
+
+_Exemplo de relatório PDF da Emissão de Croqui gerado pela aplicação._
 
 ## Localização e Consulta de Imóveis
 
