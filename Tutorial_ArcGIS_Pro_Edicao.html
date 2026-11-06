@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tutorial: Edição no ArcGIS Pro para o Cadastro | GeoAPUC</title>
+<meta name="description" content="Tutorial prático GeoAPUC: edição de lotes no ArcGIS Pro para o Cadastro Técnico Multifinalitário de Apucarana — guia Edit, snapping, construção por direção e distância, desmembramento, remembramento, memorial descritivo e atributos.">
+<style>
+  :root{
+    --azul-vibrante:#4285F4;
+    --marinho:#1A2942;
+    --laranja:#F5A623;
+    --cinza-claro:#F4F6F9;
+    --branco:#FFFFFF;
+    --texto:#2D3748;
+    --texto-claro:#6B7A90;
+    --borda:#E2E8F0;
+    --sidebar-w:280px;
+    --verde:#2E7D32;
+    --verde-claro:#F0F9F0;
+    --vermelho:#C62828;
+    --vermelho-claro:#FDECEA;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Segoe UI', Roboto, Helvetica, Arial, sans-serif;color:var(--texto);background:var(--cinza-claro);line-height:1.65;}
+
+  /* ========== CAPA ========== */
+  .cover{position:relative;min-height:100vh;background:var(--branco);display:flex;flex-direction:column;justify-content:center;overflow:hidden;}
+  .cover::after{content:"";position:absolute;top:-10%;right:-15%;width:65%;height:140%;background:var(--azul-vibrante);transform:rotate(18deg);z-index:0;}
+  .cover-content{position:relative;z-index:1;max-width:900px;padding:0 6%;}
+  .badge{display:inline-block;background:var(--laranja);color:var(--branco);font-weight:700;font-size:.8rem;letter-spacing:.08em;padding:.6rem 1.4rem;border-radius:6px;margin-bottom:2rem;text-transform:uppercase;}
+  .cover h1{font-size:clamp(2.5rem, 6vw, 4.2rem);font-weight:800;color:var(--marinho);line-height:1.15;margin-bottom:2rem;letter-spacing:-.02em;}
+  .cover-sub{font-size:1.15rem;font-weight:600;color:var(--marinho);max-width:520px;margin-bottom:3rem;}
+  .cover-footer{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+  .cover-footer img{height:60px;width:auto;}
+  .cover-footer span{font-weight:700;color:var(--marinho);font-size:1rem;}
+  .scroll-hint{position:absolute;bottom:2.5rem;left:6%;z-index:1;font-size:.85rem;color:var(--texto-claro);display:flex;align-items:center;gap:.5rem;}
+  .scroll-hint::after{content:"↓";animation:bounce 1.6s infinite;}
+  @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(6px);}}
+
+  /* ========== LAYOUT ========== */
+  .layout{display:flex;align-items:flex-start;}
+  .sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--marinho);color:var(--branco);height:100vh;position:sticky;top:0;overflow-y:auto;padding:2rem 1.5rem;}
+  .sidebar-logo{display:flex;align-items:center;gap:.8rem;margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid rgba(255,255,255,.12);}
+  .sidebar-logo img{height:55px;width:auto;}
+  .sidebar-logo span{font-size:.78rem;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.08em;}
+  .sidebar h3{font-size:.75rem;text-transform:uppercase;letter-spacing:.12em;color:var(--laranja);margin-bottom:1rem;font-weight:700;}
+  .sidebar nav ul{list-style:none;}
+  .sidebar nav li{margin-bottom:.3rem;}
+  .sidebar nav li.sub a{padding-left:2.1rem;font-size:.85rem;}
+  .sidebar nav a{display:flex;align-items:center;gap:.7rem;color:rgba(255,255,255,.75);text-decoration:none;font-size:.92rem;padding:.6rem .7rem;border-radius:6px;transition:all .15s ease;}
+  .sidebar nav a:hover{background:rgba(255,255,255,.06);color:var(--branco);}
+  .sidebar nav a .num{display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.1);font-size:.75rem;font-weight:700;flex-shrink:0;}
+  .sidebar nav a:hover .num{background:var(--azul-vibrante);}
+
+  /* ========== CONTEÚDO ========== */
+  .content{flex:1;min-width:0;max-width:940px;padding:3.5rem 4rem 6rem;}
+  .content h2{font-size:2rem;font-weight:800;color:var(--marinho);margin:3.5rem 0 1.2rem;padding-bottom:.7rem;border-bottom:3px solid var(--laranja);display:inline-block;line-height:1.25;}
+  .content section.bloco:first-of-type h2{margin-top:0;}
+  .content h3{font-size:1.3rem;font-weight:700;color:var(--azul-vibrante);margin:2rem 0 .8rem;}
+  .content h3.sub{font-size:1.45rem;color:var(--marinho);margin:2.8rem 0 1rem;display:flex;align-items:center;gap:.7rem;}
+  .sub-n{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;padding:0 .4rem;border-radius:8px;background:var(--laranja);color:var(--branco);font-size:1rem;font-weight:800;}
+  .content p{margin-bottom:1rem;}
+  .content ul, .content ol{margin:0 0 1.2rem 1.5rem;}
+  .content li{margin-bottom:.4rem;}
+  .content > section > p.lead-bloco{font-size:1.1rem;color:var(--marinho);font-weight:600;max-width:720px;}
+  .lead{color:var(--texto-claro);}
+  .chips{display:flex;flex-wrap:wrap;gap:.5rem;margin:.4rem 0 1.5rem;}
+  .chips span{background:var(--branco);border:1px solid var(--borda);border-radius:999px;padding:.3rem .9rem;font-size:.85rem;color:var(--marinho);}
+  hr{border:none;border-top:1px solid var(--borda);margin:3rem 0;}
+  code,.caminho{background:var(--branco);border:1px solid var(--borda);padding:.1rem .45rem;border-radius:4px;font-family:'Consolas', monospace;font-size:.88em;color:var(--azul-vibrante);white-space:nowrap;}
+  kbd{font-family:'Consolas', monospace;background:var(--branco);border:1px solid #c9d3dc;border-bottom-width:2px;border-radius:5px;padding:0 .4rem;font-size:.85em;color:var(--marinho);}
+  a{color:var(--azul-vibrante);}
+
+  /* Caixas de destaque */
+  .box{border-radius:10px;padding:1.1rem 1.4rem;margin:1.5rem 0;border-left:4px solid;}
+  .box strong{color:var(--marinho);}
+  .box strong.t{display:block;margin-bottom:.3rem;}
+  .box p{margin:.3rem 0;}
+  .info{background:#EAF2FE;border-color:var(--azul-vibrante);}
+  .dica{background:var(--verde-claro);border-color:#4CAF50;}
+  .aviso{background:#FFF6E8;border-color:var(--laranja);}
+  .perigo{background:var(--vermelho-claro);border-color:var(--vermelho);}
+  .cenario{background:var(--branco);border:1px solid var(--borda);border-left:4px solid var(--azul-vibrante);border-radius:10px;padding:1.1rem 1.4rem;margin:0 0 1rem;}
+  .cenario b:first-child{color:var(--azul-vibrante);}
+  .regra{background:var(--marinho);color:var(--branco);border-radius:10px;padding:1.1rem 1.4rem;margin:1.2rem 0;}
+  .regra b{color:var(--laranja);}
+  .regra kbd{color:var(--marinho);}
+
+  /* Passos numerados */
+  ol.passos{list-style:none;counter-reset:p;margin:1rem 0 1.4rem;padding:0;}
+  ol.passos>li{counter-increment:p;position:relative;padding:.75rem 1rem .75rem 3.6rem;background:var(--branco);border:1px solid var(--borda);border-radius:10px;margin-bottom:.6rem;}
+  ol.passos>li::before{content:counter(p);position:absolute;left:.9rem;top:.7rem;width:30px;height:30px;border-radius:50%;background:var(--azul-vibrante);color:var(--branco);font-weight:800;font-size:.9rem;display:flex;align-items:center;justify-content:center;}
+  .controles{display:flex;gap:.6rem;justify-content:flex-end;margin:0 0 .8rem;}
+  .controles button{background:var(--branco);border:1px solid var(--borda);border-radius:6px;padding:.4rem .9rem;cursor:pointer;color:var(--marinho);font:inherit;font-size:.85rem;font-weight:600;}
+  .controles button:hover{border-color:var(--azul-vibrante);color:var(--azul-vibrante);}
+  details.passo{background:var(--branco);border:1px solid var(--borda);border-radius:12px;margin:1rem 0;box-shadow:0 2px 10px rgba(26,41,66,.05);}
+  details.passo>summary{cursor:pointer;list-style:none;padding:1rem 1.3rem;font-weight:700;font-size:1.12rem;color:var(--marinho);display:flex;align-items:center;gap:1rem;}
+  details.passo>summary::-webkit-details-marker{display:none;}
+  details.passo>summary .num{flex:none;width:42px;height:42px;border-radius:50%;background:var(--azul-vibrante);color:var(--branco);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem;}
+  details.passo>summary .seta{margin-left:auto;transition:transform .2s;color:var(--texto-claro);font-size:1.3rem;}
+  details.passo[open]>summary .seta{transform:rotate(90deg);}
+  details.passo .corpo{padding:0 1.3rem 1.2rem;}
+  details.passo ol.passos>li{background:var(--cinza-claro);}
+
+  /* Carrossel de telas */
+  .carrossel{border:1px solid var(--borda);border-radius:10px;background:var(--cinza-claro);padding:.8rem;margin:1rem 0 1.4rem;}
+  .slide{display:none;margin:0;}
+  .slide.ativo{display:block;}
+  .tela{position:relative;margin:0 auto;background:var(--branco);border:1px solid var(--borda);border-radius:8px;overflow:hidden;box-shadow:0 4px 16px rgba(26,41,66,.08);}
+  .content .tela img{display:block;width:100%;height:auto;margin:0;border:0;border-radius:0;box-shadow:none;}
+  .mk{position:absolute;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:var(--marinho);color:var(--branco);font-weight:800;font-size:.8rem;display:flex;align-items:center;justify-content:center;border:2px solid var(--laranja);box-shadow:0 1px 4px rgba(0,0,0,.35);}
+  figcaption{padding:.7rem .2rem .1rem;font-size:.9rem;}
+  figcaption strong{color:var(--marinho);}
+  ol.leg{list-style:none;margin:.5rem 0 0;padding:0;}
+  ol.leg li{display:flex;gap:.6rem;align-items:flex-start;margin:.35rem 0;}
+  .mkl{flex:none;width:22px;height:22px;border-radius:50%;background:var(--marinho);color:var(--branco);font-weight:800;font-size:.72rem;display:flex;align-items:center;justify-content:center;border:2px solid var(--laranja);margin-top:2px;}
+  .nav{display:flex;align-items:center;justify-content:center;gap:.8rem;margin-top:.7rem;}
+  .nav>button{width:36px;height:36px;border-radius:50%;border:1px solid var(--borda);background:var(--branco);font-size:1.3rem;line-height:1;cursor:pointer;color:var(--marinho);}
+  .nav>button:hover{border-color:var(--azul-vibrante);color:var(--azul-vibrante);}
+  .dots{display:flex;gap:6px;}
+  .dot{width:10px;height:10px;border-radius:50%;border:0;background:#c5d1db;cursor:pointer;padding:0;}
+  .dot.ativo{background:var(--azul-vibrante);}
+
+  /* Confira / exercícios / quiz */
+  .confira{background:var(--verde-claro);border-left:4px solid #4CAF50;border-radius:10px;padding:.9rem 1.2rem;margin:1rem 0;}
+  .confira b.t{color:var(--verde);}
+  .confira ul{margin:.3rem 0 0 1.2rem;}
+  .exercicio{background:var(--branco);border:2px dashed #A9C5F7;border-radius:12px;padding:1.1rem 1.3rem;margin:1rem 0;}
+  .exercicio h3{margin-top:0;color:var(--marinho);font-size:1.15rem;}
+  .exercicio .meta-ex{font-size:.85rem;color:var(--texto-claro);margin:-.4rem 0 .6rem;}
+  .exercicio.desafio{border:2px solid var(--laranja);background:linear-gradient(135deg,#FFF6E8,#fff);}
+  .exercicio.desafio h3{color:#B7791F;}
+  details.dica-desafio{border:1px solid #F3D9A9;border-radius:8px;background:var(--branco);margin:.5rem 0;padding:0 .9rem;}
+  details.dica-desafio>summary{cursor:pointer;padding:.5rem 0;font-weight:700;color:#B7791F;}
+  details.dica-desafio p{margin:.2rem 0 .7rem;}
+  .q{background:var(--branco);border:1px solid var(--borda);border-radius:10px;padding:1rem 1.2rem;margin:.8rem 0;}
+  .q p{margin:0 0 .5rem;font-weight:700;color:var(--marinho);}
+  .q label{display:block;padding:.45rem .7rem;border:1px solid var(--borda);border-radius:8px;margin:.35rem 0;cursor:pointer;background:var(--branco);}
+  .q label:hover{border-color:var(--azul-vibrante);}
+  .q input{margin-right:.5rem;}
+  .q .fb{display:none;margin-top:.5rem;font-size:.92rem;padding:.5rem .7rem;border-radius:8px;}
+  .q .fb.ok{display:block;background:var(--verde-claro);color:#14532d;}
+  .q .fb.no{display:block;background:var(--vermelho-claro);color:#7f1d1d;}
+
+  /* Tabelas */
+  .tbl{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;margin:1rem 0 1.5rem;font-size:.92rem;background:var(--branco);}
+  th{background:var(--marinho);color:var(--branco);text-align:left;padding:.7rem 1rem;font-weight:600;}
+  th:first-child{border-radius:8px 0 0 0;}
+  th:last-child{border-radius:0 8px 0 0;}
+  td{padding:.65rem 1rem;border-bottom:1px solid var(--borda);vertical-align:top;}
+  tr:nth-child(even) td{background:var(--cinza-claro);}
+  td.num{font-family:'Consolas', monospace;white-space:nowrap;}
+
+  .svgbox{background:var(--branco);border:1px solid var(--borda);border-radius:10px;padding:.6rem;margin:.8rem 0;text-align:center;}
+  .svgbox svg{max-width:440px;width:100%;height:auto;}
+  .dois{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;align-items:start;}
+  .dois>*{min-width:0;}
+
+  .baixar{display:inline-block;background:var(--laranja);color:var(--branco);text-decoration:none;font-weight:800;padding:.9rem 1.6rem;border-radius:8px;box-shadow:0 4px 14px rgba(245,166,35,.35);}
+  .baixar:hover{background:#E0921A;}
+  .proximo{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin:2rem 0 0;}
+  .proximo a{display:inline-block;background:var(--marinho);color:var(--branco);text-decoration:none;padding:.6rem 1.2rem;border-radius:6px;font-weight:600;font-size:.9rem;}
+  .proximo a:hover{background:var(--azul-vibrante);}
+
+  /* Rodapé */
+  .footer{background:var(--marinho);color:rgba(255,255,255,.7);padding:3rem 4rem;text-align:center;}
+  .footer strong{color:var(--branco);}
+  .footer a{color:var(--laranja);text-decoration:none;}
+  .back-to-top{display:inline-block;margin-top:1.5rem;color:var(--azul-vibrante);background:rgba(255,255,255,.08);padding:.6rem 1.4rem;border-radius:6px;text-decoration:none;font-weight:600;font-size:.9rem;transition:background .15s ease;}
+  .back-to-top:hover{background:rgba(255,255,255,.15);}
+
+  @media (max-width: 900px){
+    .layout{flex-direction:column;align-items:stretch;}
+    code,.caminho{white-space:normal;word-break:break-word;}
+    .sidebar{width:100%;height:auto;position:relative;padding:1.5rem;}
+    .content{padding:2rem 1rem 4rem;}
+    .footer{padding:2.5rem 1.5rem;}
+    .dois{grid-template-columns:1fr;}
+    .mk{width:20px;height:20px;font-size:.68rem;}
+    .content h2{font-size:1.6rem;}
+  }
+  @media print{
+    .cover{min-height:auto;padding:3rem 0;}
+    .sidebar,.nav,.controles,.scroll-hint{display:none;}
+    .slide{display:block;margin-bottom:1rem;}
+    details.passo{break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ CAPA ============ -->
+<header class="cover" id="topo">
+  <div class="cover-content">
+    <span class="badge">Tutorial Prático</span>
+    <h1>Edição no ArcGIS Pro<br>para o Cadastro</h1>
+    <p class="cover-sub">
+      Aprenda a editar lotes com precisão: da guia Edit ao desmembramento, ao remembramento
+      e ao lançamento de lotes por memorial descritivo — usando a base real do Centro de Apucarana.
+    </p>
+    <div class="cover-footer">
+      <img src="./img/edicao-arcgis/logo-geoapuc.png" alt="Logo GeoAPUC">
+      <span>IDEPPLAN | Prefeitura de Apucarana</span>
+    </div>
+  </div>
+  <div class="scroll-hint">Role para começar</div>
+</header>
+
+<!-- ============ LAYOUT: SIDEBAR + CONTEÚDO ============ -->
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <img src="./img/edicao-arcgis/logo-geoapuc-branco.png" alt="GeoAPUC">
+      <span>Índice</span>
+    </div>
+    <h3>Conteúdo do Tutorial</h3>
+    <nav>
+      <ul>
+        <li><a href="#introducao"><span class="num">1</span> Introdução</a></li>
+        <li><a href="#ambiente"><span class="num">2</span> Preparar o ambiente</a></li>
+        <li><a href="#bloco-a"><span class="num">3</span> A · Guia Edit</a></li>
+        <li><a href="#bloco-b"><span class="num">4</span> B · Snapping e construção</a></li>
+        <li class="sub"><a href="#epilogo">📜 Epílogo: o memorial</a></li>
+        <li><a href="#bloco-c"><span class="num">5</span> C · Editar lotes</a></li>
+        <li><a href="#bloco-d"><span class="num">6</span> D · Atributos</a></li>
+        <li><a href="#atalhos"><span class="num">7</span> Atalhos e glossário</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main class="content">
+
+    <section class="bloco" id="introducao">
+      <h2>🎯 Introdução</h2>
+      <p>
+        Bem-vindo ao tutorial de <strong>edição no ArcGIS Pro para o Cadastro Técnico Multifinalitário</strong>!
+        Ele foi feito para técnicos que estão começando no ArcGIS Pro e precisam manter os lotes de
+        Apucarana atualizados — com medidas exatas, sem frestas e com os atributos corretos.
+      </p>
+
+      <h3>O que você vai aprender</h3>
+      <div class="tbl"><table>
+        <tr><th>Bloco</th><th>Tema</th><th>Tempo</th></tr>
+        <tr><td><strong>A</strong></td><td>Guia Edit: preparar o projeto, selecionar, ler atributos, salvar e descartar</td><td>~40 min</td></tr>
+        <tr><td><strong>B</strong></td><td>Snapping e construção: Parallel, Perpendicular, Direction/Distance, Reverse Direction, Finish — e o epílogo sobre memoriais</td><td>~60 min</td></tr>
+        <tr><td><strong>C</strong></td><td>Editar lotes: desmembrar, remembrar, unir e lançar por memorial</td><td>~60 min</td></tr>
+        <tr><td><strong>D</strong></td><td>Atributos: corrigir inscrição e área, calcular em lote, copiar dados e achar divergências</td><td>~45 min</td></tr>
+      </table></div>
+
+      <h3>O que você precisa</h3>
+      <ol class="passos">
+        <li><strong>ArcGIS Pro</strong> com licença ArcGIS Professional.</li>
+        <li>A <strong>base de treino</strong> (download gratuito) e cerca de <strong>10 minutos</strong> para preparar o projeto — veja <a href="#ambiente">Preparar o ambiente</a>.</li>
+      </ol>
+
+      <div class="box dica"><strong class="t">💡 Dica do professor</strong>
+        <p>Cada bloco tem um <strong>passo a passo</strong> com as telas anotadas (use as setas ‹ › para avançar), exercícios com <strong>✅ Confira</strong> e um <strong>teste rápido</strong>. Use o índice ao lado para ir direto ao bloco que você precisa.</p>
+      </div>
+      <div class="box info"><strong class="t">🛡️ Pode errar à vontade</strong>
+        <p>A base de treino é uma cópia: nada do que você editar altera o cadastro oficial. Mesmo assim, crie o hábito de terminar cada exercício com <strong>Discard › Yes</strong>.</p>
+      </div>
+      <p>Quer reforçar os fundamentos antes? O curso on-line <a href="https://www.esri.com/en-us/training/catalog/5a9f11d1c5c7c34872fcc218/editing-basics-in-arc-gis-pro" target="_blank" rel="noopener">Editing Basics in ArcGIS Pro</a> (Esri Academy, ~1h40) é um bom complemento.</p>
+    </section>
+
+    <hr>
+
+    <section class="bloco" id="ambiente">
+      <h2>🧰 Preparar o ambiente</h2>
+      <p class="lead-bloco">Antes do Bloco A: baixar a base de treino, criar o seu projeto e conectar o banco. Faça uma vez só.</p>
+      <div class="chips"><span>⏱️ ~10 min</span><span>💾 ~0,5 MB</span></div>
+
+      <p style="margin:1.2rem 0 1.6rem;"><a class="baixar" href="./dados/CTM_Treino_Centro.zip" download>⬇️ Baixar a base de treino (CTM_Treino_Centro.zip)</a></p>
+
+      <div class="box info"><strong class="t">📦 O que vem no arquivo</strong>
+        <p><span class="caminho">CTM_Treino.gdb</span> — geodatabase com <strong>Lotes</strong> (5.020, bairro Centro), <strong>Quadras</strong> (219), <strong>Logradouros</strong> (120) e <strong>Edificacoes</strong> (vazia, para desenhar).</p>
+        <p><span class="caminho">Bookmarks_Tutorial_CTM.bkmx</span> — os bookmarks <strong>centro</strong> e <strong>quadra 101.014</strong>, usados em todos os blocos.</p>
+        <p>Dados pessoais e fiscais foram removidos. Uso exclusivo para treinamento.</p>
+      </div>
+
+      <h3>1️⃣ Descompactar</h3>
+      <ol class="passos">
+        <li>Crie a pasta <span class="caminho">C:\Tutorial_CTM</span>.</li>
+        <li>Clique com o botão direito no arquivo baixado › <strong>Extrair tudo…</strong> › destino <span class="caminho">C:\Tutorial_CTM</span>.</li>
+        <li>Confira: dentro da pasta devem aparecer <span class="caminho">CTM_Treino.gdb</span> e <span class="caminho">Bookmarks_Tutorial_CTM.bkmx</span>.</li>
+      </ol>
+      <div class="box info"><strong class="t">🔒 Sem permissão para criar pasta em C:\?</strong>
+        <p>Em muitas máquinas de órgãos públicos e empresas, o usuário não pode criar pastas direto no <span class="caminho">C:\</span>. Nesse caso, use <span class="caminho">Documentos\Tutorial_CTM</span> (ou outra pasta onde você possa gravar) e siga igual: onde o tutorial disser <span class="caminho">C:\Tutorial_CTM</span>, use a sua pasta. Nada no tutorial depende de um caminho fixo.</p>
+      </div>
+      <div class="box aviso"><strong class="t">⚠️ Descompacte antes de abrir</strong>
+        <p>O ArcGIS Pro não lê um geodatabase de dentro do .zip. Se a base não aparecer no Pro, quase sempre é porque ela ainda está compactada.</p>
+      </div>
+
+      <h3>2️⃣ Criar o projeto em branco</h3>
+      <ol class="passos">
+        <li>Abra o ArcGIS Pro. Na tela inicial, em <strong>New</strong>, clique em <strong>Map</strong>.</li>
+        <li><strong>Name:</strong> <span class="caminho">Treino_CTM</span> · <strong>Location:</strong> <span class="caminho">C:\Tutorial_CTM</span> › <strong>OK</strong>.</li>
+        <li>O Pro cria a pasta <span class="caminho">C:\Tutorial_CTM\Treino_CTM</span> com o arquivo do projeto (<span class="caminho">Treino_CTM.aprx</span>) e abre um mapa vazio.</li>
+      </ol>
+
+      <h3>3️⃣ Conectar o banco do tutorial</h3>
+      <ol class="passos">
+        <li>Abra o painel <strong>Catalog</strong> (guia <span class="caminho">View › Catalog Pane</span>, se não estiver aberto).</li>
+        <li>Clique com o botão direito em <strong>Databases</strong> › <strong>Add Database</strong>.</li>
+        <li>Navegue até <span class="caminho">C:\Tutorial_CTM</span>, selecione <span class="caminho">CTM_Treino.gdb</span> › <strong>OK</strong>.</li>
+      </ol>
+
+      <h3>4️⃣ Colocar as camadas no mapa</h3>
+      <ol class="passos">
+        <li>No Catalog, expanda <strong>Databases › CTM_Treino.gdb</strong>.</li>
+        <li>Segure <kbd>Ctrl</kbd> e clique em <strong>Edificacoes</strong>, <strong>Logradouros</strong>, <strong>Lotes</strong> e <strong>Quadras</strong> › botão direito › <strong>Add To Current Map</strong>.</li>
+        <li>No painel <strong>Contents</strong>, arraste para que a ordem fique: Logradouros, Edificacoes, Lotes, Quadras (de cima para baixo).</li>
+      </ol>
+      <div class="box dica"><strong class="t">💡 Deixe o mapa igual às telas do tutorial (opcional)</strong>
+        <p>No Contents, clique no símbolo de <strong>Lotes</strong> › <strong>Properties</strong> › cor de preenchimento <strong>No color</strong>, contorno <strong>laranja</strong>. Faça o mesmo em <strong>Quadras</strong> com contorno <strong>preto</strong> e largura <strong>2 pt</strong>. Assim as divisas ficam visíveis como nas imagens.</p>
+      </div>
+
+      <h3>5️⃣ Importar os bookmarks</h3>
+      <ol class="passos">
+        <li>Guia <strong>Map › Bookmarks</strong> (seta) › <strong>Import Bookmarks</strong>.</li>
+        <li>Selecione <span class="caminho">C:\Tutorial_CTM\Bookmarks_Tutorial_CTM.bkmx</span> › <strong>OK</strong>.</li>
+        <li>Clique em <strong>Map › Bookmarks › quadra 101.014</strong>: o mapa vai para a quadra dos exercícios.</li>
+      </ol>
+
+      <h3>6️⃣ Salvar o projeto</h3>
+      <ol class="passos">
+        <li><kbd>Ctrl</kbd>+<kbd>S</kbd> (ou <strong>Project › Save</strong>). A partir de agora, abra sempre o <span class="caminho">Treino_CTM.aprx</span>.</li>
+      </ol>
+
+      <div class="confira"><b class="t">✅ Confira</b><ul>
+        <li>Abra a tabela de <strong>Lotes</strong> (botão direito › Attribute Table): o rodapé mostra <strong>5.020</strong> registros.</li>
+        <li>Quadras: <strong>219</strong> · Logradouros: <strong>120</strong> · Edificacoes: <strong>0</strong>.</li>
+        <li>O bookmark <strong>quadra 101.014</strong> mostra a quadra do lote <span class="caminho">101-014-0355-001</span>, na esquina.</li>
+      </ul></div>
+
+      <div class="box info"><strong class="t">🔄 Quer recomeçar do zero?</strong>
+        <p>Feche o ArcGIS Pro, apague <span class="caminho">C:\Tutorial_CTM\CTM_Treino.gdb</span> e descompacte o arquivo de novo. O seu projeto continua funcionando, apontando para a base nova.</p>
+      </div>
+      <div class="proximo"><a href="#introducao">← Introdução</a><a href="#bloco-a">Bloco A →</a></div>
+    </section>
+
+    <hr>
+<section class="bloco" id="bloco-a">
+<h2>🖥️ Bloco A — Conhecendo a guia Edit</h2>
+<p class="lead-bloco">Antes de desmembrar ou unir lotes, o técnico precisa saber onde ficam as ferramentas, como escolher o que é editável e como gravar — ou desfazer — com segurança.</p>
+<div class="chips"><span>👥 Técnicos iniciantes no ArcGIS Pro</span><span>⏱️ ~40 min</span><span>🗺️ Base de treino · Centro · quadra 101.014</span></div>
+
+
+<div class="parte">
+  <div class="cenario">
+    <p><b>📍 Cenário</b> — Primeiro dia no cadastro. Você recebeu o projeto de treino com os lotes do Centro de Apucarana. Antes de qualquer alteração, sua chefia pediu que você deixe o ArcGIS Pro preparado e mostre que sabe <b>selecionar um lote, ler seus dados e desfazer uma edição</b> sem deixar rastro.</p>
+  </div>
+  <h3>Ao final deste bloco você vai saber</h3>
+  <ol class="passos">
+    <li>Travar a edição para ninguém alterar o cadastro sem querer.</li>
+    <li>Escolher quais camadas podem ser editadas.</li>
+    <li>Localizar as ferramentas da guia <b>Edit</b> e os painéis <b>Create</b> e <b>Modify</b>.</li>
+    <li>Selecionar um lote e ler os atributos dele.</li>
+    <li>Salvar ou descartar uma edição com segurança.</li>
+  </ol>
+  <div class="box info"><strong class="t">🗂️ O que você precisa</strong>
+    <p>Projeto de treino aberto com as camadas <b>Lotes</b>, <b>Quadras</b>, <b>Logradouros</b> e <b>Edificacoes</b>, e os bookmarks <b>centro</b> e <b>quadra 101.014</b> (<span class="caminho">Map › Bookmarks</span>).</p>
+  </div>
+</div>
+
+<div class="parte">
+  <h3 class="sub"><span class="sub-n">A</span>Passo a passo</h3>
+  <div class="controles"><button type="button" class="abrir">Expandir todos</button><button type="button" class="fechar">Recolher todos</button></div>
+
+  <details class="passo" open>
+    <summary><span class="num">1</span>Preparar o projeto (uma vez só)<span class="seta">›</span></summary>
+    <div class="corpo">
+      <ol class="passos">
+        <li>Abra <span class="caminho">Project › Options › Editing</span> e, em <b>Session</b>, deixe marcadas as três opções indicadas na tela 1. Faça isso <b>com a edição desligada</b> — com uma sessão aberta, a primeira caixa fica acinzentada.</li>
+        <li>No painel <b>Contents</b>, clique na aba do lápis (<b>List By Editing</b>) e deixe marcadas só as quatro camadas do cadastro (tela 2).</li>
+      </ol>
+      <div class="carrossel" id="a-c1"><figure class="slide ativo"><div class="tela" style="max-width:640px"><img src="./img/edicao-arcgis/A02_options_session.png" alt="Project › Options › Editing › Session" width="640" height="509"><span class="mk" style="left:30.63%;top:42.83%">1</span><span class="mk" style="left:30.63%;top:78.19%">2</span><span class="mk" style="left:30.63%;top:82.51%">3</span></div><figcaption><strong>1/2 · Project › Options › Editing › Session</strong><ol class="leg"><li><span class="mkl">1</span><span><b>Enable and disable editing from the Edit tab</b> — liga a trava: só edita quem clicar em <b>Edit</b>.</span></li><li><span class="mkl">2</span><span><b>Show dialog to confirm save edits</b> — pede confirmação antes de gravar.</span></li><li><span class="mkl">3</span><span><b>Show dialog to confirm discard edits</b> — pede confirmação antes de descartar.</span></li></ol></figcaption></figure><figure class="slide"><div class="tela" style="max-width:375px"><img src="./img/edicao-arcgis/A03_list_by_editing.png" alt="Contents › List By Editing" width="375" height="509"><span class="mk" style="left:35.47%;top:21.22%">1</span><span class="mk" style="left:4.27%;top:45.19%">2</span></div><figcaption><strong>2/2 · Contents › List By Editing</strong><ol class="leg"><li><span class="mkl">1</span><span>Aba <b>List By Editing</b> (o lápis) no painel Contents.</span></li><li><span class="mkl">2</span><span>Caixinhas de edição: marcadas = camada editável. Ficam só as 4 do cadastro.</span></li></ol></figcaption></figure><div class="nav"><button type="button" class="ant" aria-label="Anterior">‹</button><div class="dots"><button type="button" class="dot ativo" aria-label="Tela 1" data-i="0"></button><button type="button" class="dot" aria-label="Tela 2" data-i="1"></button></div><button type="button" class="prox" aria-label="Próxima">›</button></div></div>
+      <div class="confira"><b class="t">✅ Confira</b>
+        <ul><li>Na guia Edit, o botão <b>Edit</b> aparece e os botões <b>Save</b> e <b>Discard</b> estão acinzentados.</li>
+        <li>Em List By Editing aparecem exatamente 4 camadas marcadas.</li></ul>
+      </div>
+    </div>
+  </details>
+
+  <details class="passo">
+    <summary><span class="num">2</span>Conhecer a guia Edit e os painéis<span class="seta">›</span></summary>
+    <div class="corpo">
+      <p>A guia <b>Edit</b> concentra tudo o que vamos usar. Não é preciso decorar — basta saber <b>onde</b> fica cada grupo.</p>
+      <div class="carrossel" id="a-c2"><figure class="slide ativo"><div class="tela" style="max-width:950px"><img src="./img/edicao-arcgis/A01_guia_edit.png" alt="A guia Edit (parte esquerda)" width="950" height="112"><span class="mk" style="left:17.47%;top:12.50%">1</span><span class="mk" style="left:23.37%;top:12.50%">2</span><span class="mk" style="left:28.63%;top:12.50%">3</span><span class="mk" style="left:67.58%;top:12.50%">4</span><span class="mk" style="left:73.26%;top:12.50%">5</span><span class="mk" style="left:85.79%;top:12.50%">6</span><span class="mk" style="left:89.47%;top:18.75%">7</span></div><figcaption><strong>1/3 · A guia Edit (parte esquerda)</strong><ol class="leg"><li><span class="mkl">1</span><span><b>Edit</b> — liga e desliga a edição.</span></li><li><span class="mkl">2</span><span><b>Save</b> — grava as alterações no banco.</span></li><li><span class="mkl">3</span><span><b>Discard</b> — desfaz tudo desde o último Save.</span></li><li><span class="mkl">4</span><span><b>Create</b> — abre o painel para desenhar feições novas.</span></li><li><span class="mkl">5</span><span><b>Modify</b> — abre o painel com as ferramentas de alteração.</span></li><li><span class="mkl">6</span><span><b>Select</b> — seleciona feições no mapa.</span></li><li><span class="mkl">7</span><span><b>Attributes</b> — abre o painel de atributos da seleção.</span></li></ol></figcaption></figure><figure class="slide"><div class="tela" style="max-width:364px"><img src="./img/edicao-arcgis/A04_create_features.png" alt="Painel Create Features (à direita do mapa)" width="364" height="553"><span class="mk" style="left:8.24%;top:14.29%">1</span><span class="mk" style="left:31.59%;top:43.94%">2</span><span class="mk" style="left:87.36%;top:48.28%">3</span></div><figcaption><strong>2/3 · Painel Create Features (à direita do mapa)</strong><ol class="leg"><li><span class="mkl">1</span><span>Aba <b>Templates</b> do painel Create Features (aberto pelo botão <b>Create</b> da guia Edit).</span></li><li><span class="mkl">2</span><span>Cada camada editável vira um <b>template</b> — aqui, Lotes.</span></li><li><span class="mkl">3</span><span>Ao clicar no template aparecem as <b>ferramentas de construção</b> (polígono, retângulo, círculo…).</span></li></ol></figcaption></figure><figure class="slide"><div class="tela" style="max-width:1007px"><img src="./img/edicao-arcgis/A05_modify_features.png" alt="Painel Modify Features (a lista continua rolando para baixo)" width="1007" height="844"><span class="mk" style="left:2.18%;top:49.41%">1</span><span class="mk" style="left:2.18%;top:90.17%">2</span><span class="mk" style="left:54.12%;top:29.98%">3</span><span class="mk" style="left:54.12%;top:37.56%">4</span></div><figcaption><strong>3/3 · Painel Modify Features (a lista continua rolando para baixo)</strong><ol class="leg"><li><span class="mkl">1</span><span><b>Edit Vertices</b> — mover, inserir e apagar vértices.</span></li><li><span class="mkl">2</span><span><b>Split</b> — dividir um lote (desmembramento).</span></li><li><span class="mkl">3</span><span><b>Merge</b> — juntar lotes (remembramento).</span></li><li><span class="mkl">4</span><span><b>Copy Parallel</b> — linha paralela a uma divisa, útil para marcar testadas.</span></li></ol></figcaption></figure><div class="nav"><button type="button" class="ant" aria-label="Anterior">‹</button><div class="dots"><button type="button" class="dot ativo" aria-label="Tela 1" data-i="0"></button><button type="button" class="dot" aria-label="Tela 2" data-i="1"></button><button type="button" class="dot" aria-label="Tela 3" data-i="2"></button></div><button type="button" class="prox" aria-label="Próxima">›</button></div></div>
+      <div class="box dica"><strong class="t">💡 Create × Modify</strong>
+        <p><b>Create</b> é para desenhar o que ainda não existe (uma edificação nova). <b>Modify</b> é para alterar o que já existe (dividir, juntar, mover vértices). Desmembramento e remembramento são <b>Modify</b>.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="passo">
+    <summary><span class="num">3</span>Selecionar um lote e ler seus dados<span class="seta">›</span></summary>
+    <div class="corpo">
+      <ol class="passos">
+        <li>Vá ao bookmark <b>quadra 101.014</b>.</li>
+        <li>Na guia Edit, clique em <b>Select</b> e depois no lote da esquina, à esquerda da quadra. O contorno fica ciano (tela 1).</li>
+        <li>Clique em <b>Attributes</b> e leia os dados do lote (tela 2).</li>
+        <li>Clique com o <b>botão direito</b> sobre o lote selecionado para ver o menu de atalhos (tela 3).</li>
+      </ol>
+      <div class="carrossel" id="a-c3"><figure class="slide ativo"><div class="tela" style="max-width:1366px"><img src="./img/edicao-arcgis/A06_lote_D2_selecionado.png" alt="Lote 101-014-0355-001 selecionado" width="1366" height="804"><span class="mk" style="left:58.42%;top:3.48%">1</span><span class="mk" style="left:56.37%;top:62.19%">2</span></div><figcaption><strong>1/3 · Lote 101-014-0355-001 selecionado</strong><ol class="leg"><li><span class="mkl">1</span><span>Ferramenta <b>Select</b> ativa.</span></li><li><span class="mkl">2</span><span>Lote selecionado: contorno em <b>ciano</b>.</span></li></ol></figcaption></figure><figure class="slide"><div class="tela" style="max-width:1060px"><img src="./img/edicao-arcgis/A07_attributes_D2.png" alt="Painel Attributes do lote selecionado" width="1060" height="851"><span class="mk" style="left:54.53%;top:52.06%">1</span><span class="mk" style="left:54.53%;top:74.27%">2</span><span class="mk" style="left:54.53%;top:80.61%">3</span><span class="mk" style="left:54.53%;top:90.13%">4</span></div><figcaption><strong>2/3 · Painel Attributes do lote selecionado</strong><ol class="leg"><li><span class="mkl">1</span><span><b>inscricao</b> — a identidade do lote: setor 101, quadra 014, lote 0355.</span></li><li><span class="mkl">2</span><span><b>AR_QUADRA_</b> = 016 — código antigo; <b>não</b> é a quadra oficial (101.014).</span></li><li><span class="mkl">3</span><span><b>AR_AREA_TE</b> = 1155 — área cadastral.</span></li><li><span class="mkl">4</span><span><b>Shape_Area</b> = 1154,99 — área calculada pelo desenho. Batem!</span></li></ol></figcaption></figure><figure class="slide"><div class="tela" style="max-width:727px"><img src="./img/edicao-arcgis/A08_menu_botao_direito.png" alt="Botão direito sobre o lote selecionado" width="727" height="778"><span class="mk" style="left:34.11%;top:78.79%">1</span><span class="mk" style="left:34.11%;top:89.20%">2</span><span class="mk" style="left:34.11%;top:92.93%">3</span></div><figcaption><strong>3/3 · Botão direito sobre o lote selecionado</strong><ol class="leg"><li><span class="mkl">1</span><span><b>Move</b>, Rotate, Scale — reposicionar a feição inteira.</span></li><li><span class="mkl">2</span><span><b>Edit Vertices</b> — editar o contorno.</span></li><li><span class="mkl">3</span><span><b>Attributes</b> — mesmo painel do botão da guia Edit.</span></li></ol></figcaption></figure><div class="nav"><button type="button" class="ant" aria-label="Anterior">‹</button><div class="dots"><button type="button" class="dot ativo" aria-label="Tela 1" data-i="0"></button><button type="button" class="dot" aria-label="Tela 2" data-i="1"></button><button type="button" class="dot" aria-label="Tela 3" data-i="2"></button></div><button type="button" class="prox" aria-label="Próxima">›</button></div></div>
+      <div class="box aviso"><strong class="t">⚠️ Duas pegadinhas da base real</strong>
+        <p><b>A quadra oficial está na inscrição</b>, não no campo <b>AR_QUADRA_</b>. O lote <span class="caminho">101-014-0355-001</span> é da quadra <b>101.014</b> (setor 101, quadra 014), mesmo com AR_QUADRA_ = 016.</p>
+        <p><b>Testada de esquina:</b> o desenho mede 30 × 38,5 m, mas AR_TESTADA traz 68 — provavelmente a soma das duas frentes. Leia os campos com olhar crítico.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="passo">
+    <summary><span class="num">4</span>Salvar ou descartar com segurança<span class="seta">›</span></summary>
+    <div class="corpo">
+      <p>Toda alteração fica <b>pendente</b> até você clicar em <b>Save</b>. Enquanto não salvar, <b>Discard</b> volta tudo ao estado do último Save.</p>
+      <div class="carrossel" id="a-c4"><figure class="slide ativo"><div class="tela" style="max-width:1085px"><img src="./img/edicao-arcgis/A09_save_confirmar.png" alt="Diálogo do Save" width="1085" height="648"><span class="mk" style="left:49.77%;top:45.68%">1</span><span class="mk" style="left:65.62%;top:49.23%">2</span></div><figcaption><strong>1/2 · Diálogo do Save</strong><ol class="leg"><li><span class="mkl">1</span><span>Um vértice foi movido de propósito.</span></li><li><span class="mkl">2</span><span><b>Yes</b> grava de vez. No exercício, responda <b>No</b>.</span></li></ol></figcaption></figure><figure class="slide"><div class="tela" style="max-width:1195px"><img src="./img/edicao-arcgis/A10_discard_confirmar.png" alt="Diálogo do Discard" width="1195" height="695"><span class="mk" style="left:65.44%;top:45.04%">1</span></div><figcaption><strong>2/2 · Diálogo do Discard</strong><ol class="leg"><li><span class="mkl">1</span><span><b>Yes</b> desfaz a edição — o lote volta ao formato original.</span></li></ol></figcaption></figure><div class="nav"><button type="button" class="ant" aria-label="Anterior">‹</button><div class="dots"><button type="button" class="dot ativo" aria-label="Tela 1" data-i="0"></button><button type="button" class="dot" aria-label="Tela 2" data-i="1"></button></div><button type="button" class="prox" aria-label="Próxima">›</button></div></div>
+      <div class="box info"><strong class="t">🌊 Regra de ouro</strong>
+        <p>Salve ao fim de cada alteração concluída — não a cada clique, nem só no fim do dia. Para desfazer só o último passo, use <kbd>Ctrl</kbd>+<kbd>Z</kbd>.</p>
+      </div>
+    </div>
+  </details>
+</div>
+
+<div class="parte">
+  <h3 class="sub"><span class="sub-n">B</span>Mão na massa</h3>
+
+  <div class="exercicio">
+    <h3>Exercício A1 — Deixar o projeto seguro</h3>
+    <div class="meta-ex">⏱️ 5 min · Passo 1</div>
+    <p>Configure a sessão de edição e deixe editáveis só Lotes, Quadras, Logradouros e Edificacoes.</p>
+    <div class="confira"><b class="t">✅ Confira</b><ul><li>List By Editing mostra 4 camadas marcadas.</li><li>Sem clicar em <b>Edit</b>, as ferramentas de edição ficam inativas.</li></ul></div>
+  </div>
+
+  <div class="exercicio">
+    <h3>Exercício A2 — Encontrar e ler um lote</h3>
+    <div class="meta-ex">⏱️ 10 min · Passo 3</div>
+    <p>Selecione o lote <span class="caminho">101-014-0355-001</span> e responda: qual a área cadastral, a ocupação e o zoneamento?</p>
+    <div class="confira"><b class="t">✅ Confira</b><ul><li>AR_AREA_TE = <b>1155</b> e Shape_Area ≈ <b>1154,99 m²</b>.</li><li>AR_OCUPACA = <b>CONSTRUIDO</b> · AR_ZONEAME = <b>ZC1</b>.</li><li>Ele fica na quadra <b>101.014</b>.</li></ul></div>
+  </div>
+
+  <div class="exercicio">
+    <h3>Exercício A3 — Errar de propósito e desfazer</h3>
+    <div class="meta-ex">⏱️ 10 min · Passo 4</div>
+    <ol class="passos">
+      <li>Com o lote selecionado, abra <b>Edit Vertices</b> (botão direito › Edit Vertices) e arraste um vértice.</li>
+      <li>Clique em <b>Save</b> e responda <b>No</b>.</li>
+      <li>Clique em <b>Discard</b> e responda <b>Yes</b>.</li>
+    </ol>
+    <div class="confira"><b class="t">✅ Confira</b><ul><li>O lote volta ao formato original.</li><li>Shape_Area volta a <b>1154,99 m²</b>.</li><li>Save e Discard voltam a ficar acinzentados.</li></ul></div>
+  </div>
+</div>
+
+<div class="parte">
+  <h3 class="sub"><span class="sub-n">C</span>Teste rápido</h3>
+  <p class="lead">Quatro perguntas para fechar o bloco.</p>
+  <div id="quiz-a"></div>
+</div>
+
+<div class="parte">
+  <h3 class="sub"><span class="sub-n">D</span>Para aprofundar</h3>
+  <p>O curso on-line <a href="https://www.esri.com/en-us/training/catalog/5a9f11d1c5c7c34872fcc218/editing-basics-in-arc-gis-pro" target="_blank" rel="noopener">Editing Basics in ArcGIS Pro</a> (Esri Academy, ~1h40) cobre os mesmos fundamentos com outros exemplos. A documentação oficial tem um <a href="https://doc.esri.com/en/arcgis-pro/latest/help/editing/a-quick-tour-of-editing.html" target="_blank" rel="noopener">tour rápido pela edição</a>.</p>
+  <p><b>Próximo bloco:</b> snapping — como garantir que as divisas se encaixem.</p>
+</div>
+
+
+<div class="proximo"><a href="#ambiente">← Preparar o ambiente</a><a href="#bloco-b">Bloco B →</a></div>
+</section>
+<hr>
+<section class="bloco" id="bloco-b">
+<h2>🧲 Bloco B — Snapping e ferramentas de construção</h2>
+<p class="lead-bloco">Desenhar com precisão não é ter mão firme: é deixar o cursor encaixar onde deve e digitar medidas em vez de “acertar no olho”.</p>
+<div class="chips"><span>👥 Técnicos iniciantes no ArcGIS Pro</span><span>⏱️ ~60 min</span><span>🗺️ Base de treino · quadra 101.014 · lote V2</span></div>
+
+
+<div class="parte">
+  <div class="cenario">
+    <p><b>📍 Cenário</b> — A Prefeitura aprovou uma edificação de <b>10 × 12 m</b> no lote <span class="caminho">101-014-0240-001</span> (esquina, na quadra 101.014), com <b>2 m de afastamento lateral</b> e <b>3 m de recuo frontal</b>. Você vai desenhá-la duas vezes, por dois caminhos diferentes — e as duas precisam dar exatamente o mesmo resultado.</p>
+  </div>
+  <h3>Ao final deste bloco você vai saber</h3>
+  <ol class="passos">
+    <li>Configurar o <b>snapping</b> e ler a dica de encaixe na tela.</li>
+    <li>Desenhar lados <b>paralelos</b> (<kbd>P</kbd>) e <b>perpendiculares</b> (<kbd>E</kbd>) a uma divisa existente.</li>
+    <li>Digitar <b>direção e distância</b> (<kbd>G</kbd>) de cada lado.</li>
+    <li>Concluir o desenho com <b>Finish</b> (<kbd>F2</kbd>) e conferir a área.</li>
+    <li>Inverter o sentido de uma linha com <b>Reverse Direction</b>.</li>
+  </ol>
+  <div class="box info"><strong class="t">🗂️ Antes de começar</strong>
+    <p>Bloco A concluído; bookmark <b>quadra 101.014</b>; o lote V2 é o da esquina inferior esquerda da quadra. Todas as ferramentas deste bloco aparecem no <b>botão direito durante o desenho</b> — ou pelo atalho de teclado entre parênteses.</p>
+  </div>
+</div>
+
+<div class="parte">
+  <h3 class="sub"><span class="sub-n">A</span>Passo a passo</h3>
+  <div class="controles"><button type="button" class="abrir">Expandir todos</button><button type="button" class="fechar">Recolher todos</button></div>
+
+  <details class="passo" open>
+    <summary><span class="num">1</span>Snapping: fazer o cursor encaixar<span class="seta">›</span></summary>
+    <div class="corpo">
+      <p>Snapping é o “ímã” do cursor: quando você chega perto de um vértice ou de uma borda, o ponto gruda exatamente nela. Sem isso, toda divisa fica com frestinhas de centímetros.</p>
+      <ol class="passos">
+        <li>Na guia <b>Edit</b>, abra a seta do <b>Snapping</b> e deixe ligados os modos de <b>vértice</b>, <b>borda</b> e <b>extremidade</b> (passe o mouse sobre cada ícone para ver o nome).</li>
+        <li>No <b>Contents</b>, aba do ímã (<b>List By Snapping</b>), deixe marcadas só as camadas em que faz sentido encaixar.</li>
+        <li>Ao desenhar, observe a <b>dica</b> ao lado do cursor: ela diz em qual camada e em que tipo de ponto ele encaixou.</li>
+      </ol>
+      <div class="carrossel" id="b-c1"><figure class="slide ativo"><div class="tela" style="max-width:441px"><img src="./img/edicao-arcgis/B01_menu_snapping.png" alt="Guia Edit › Snapping" width="441" height="320"><span class="mk" style="left:17.23%;top:26.56%">1</span><span class="mk" style="left:64.17%;top:41.25%">2</span><span class="mk" style="left:20.86%;top:53.44%">3</span><span class="mk" style="left:21.32%;top:66.25%">4</span><span class="mk" style="left:20.41%;top:87.19%">5</span></div><figcaption><strong>1/3 · Guia Edit › Snapping</strong><ol class="leg"><li><span class="mkl">1</span><span>Botão <b>Snapping</b>: a seta abre o menu.</span></li><li><span class="mkl">2</span><span>Chave geral: liga e desliga o snapping.</span></li><li><span class="mkl">3</span><span>Modos de encaixe. Os destacados em azul estão ligados — passe o mouse para ver o nome de cada um.</span></li><li><span class="mkl">4</span><span><b>Set snapping tolerance</b>: o alcance do “ímã”.</span></li><li><span class="mkl">5</span><span><b>Snapping Settings</b>: todas as opções.</span></li></ol></figcaption></figure><figure class="slide"><div class="tela" style="max-width:366px"><img src="./img/edicao-arcgis/B02_list_by_snapping.png" alt="Contents › List By Snapping" width="366" height="416"><span class="mk" style="left:45.08%;top:27.64%">1</span><span class="mk" style="left:5.46%;top:60.82%">2</span></div><figcaption><strong>2/3 · Contents › List By Snapping</strong><ol class="leg"><li><span class="mkl">1</span><span>Aba <b>List By Snapping</b> (o ímã).</span></li><li><span class="mkl">2</span><span>Caixinhas: em quais camadas o cursor encaixa.</span></li></ol></figcaption></figure><figure class="slide"><div class="tela" style="max-width:415px"><img src="./img/edicao-arcgis/B03_snap_tip.png" alt="A dica de encaixe ao lado do cursor" width="415" height="418"><span class="mk" style="left:72.53%;top:32.30%">1</span></div><figcaption><strong>3/3 · A dica de encaixe ao lado do cursor</strong><ol class="leg"><li><span class="mkl">1</span><span>A dica mostra a camada e o tipo de encaixe: <b>Lotes : Vertex</b>.</span></li></ol></figcaption></figure><div class="nav"><button type="button" class="ant" aria-label="Anterior">‹</button><div class="dots"><button type="button" class="dot ativo" aria-label="Tela 1" data-i="0"></button><button type="button" class="dot" aria-label="Tela 2" data-i="1"></button><button type="button" class="dot" aria-label="Tela 3" data-i="2"></button></div><button type="button" class="prox" aria-label="Próxima">›</button></div></div>
+      <div class="box dica"><strong class="t">💡 Truque</strong>
+        <p>Segure a <kbd>Barra de espaço</kbd> enquanto desenha para <b>suspender</b> o snapping momentaneamente — útil quando há muitas linhas juntas.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="passo">
+    <summary><span class="num">2</span>Parallel (P) e Perpendicular (E)<span class="seta">›</span></summary>
+    <div class="corpo">
+      <p>Edificações quase sempre acompanham as divisas do lote. Em vez de “mirar” o ângulo, você manda o Pro copiar a direção de uma linha que já existe.</p>
+      <ol class="passos">
+        <li>Em <b>Create Features</b>, clique no template <b>Edificacoes</b> e na ferramenta <b>Polygon</b>.</li>
+        <li>Primeiro vértice com <b>Absolute X,Y</b> (<kbd>F6</kbd>): <span class="caminho">X = 453182,34</span> · <span class="caminho">Y = 7395124,81</span> › Enter.</li>
+        <li><kbd>P</kbd> › clique na <b>testada oeste</b> do lote (a borda ao longo da rua vertical). Mova o mouse para o <b>norte</b> › <kbd>D</kbd> › <b>10</b> › Enter.</li>
+        <li><kbd>E</kbd> › clique no lado que você acabou de desenhar. Mova o mouse para <b>dentro do lote</b> (leste) › <kbd>D</kbd> › <b>12</b> › Enter.</li>
+        <li><kbd>P</kbd> › clique de novo na testada. Mova o mouse para o <b>sul</b> › <kbd>D</kbd> › <b>10</b> › Enter.</li>
+        <li><b>Finish</b> (<kbd>F2</kbd>) — o último lado fecha sozinho até o primeiro vértice.</li>
+      </ol>
+      <div class="carrossel" id="b-c2"><figure class="slide ativo"><div class="tela" style="max-width:470px"><img src="./img/edicao-arcgis/B04_template_edificacoes.png" alt="Create Features › template Edificacoes" width="470" height="360"><span class="mk" style="left:2.98%;top:50.00%">1</span><span class="mk" style="left:6.17%;top:63.33%">2</span></div><figcaption><strong>1/3 · Create Features › template Edificacoes</strong><ol class="leg"><li><span class="mkl">1</span><span>Template <b>Edificacoes</b>.</span></li><li><span class="mkl">2</span><span>Ferramenta <b>Polygon</b> (a primeira da fileira).</span></li></ol></figcaption></figure><figure class="slide"><div class="tela" style="max-width:705px"><img src="./img/edicao-arcgis/B05_parallel.png" alt="Botão direito durante o desenho › Parallel" width="705" height="285"><span class="mk" style="left:9.22%;top:47.72%">1</span><span class="mk" style="left:22.84%;top:60.35%">2</span></div><figcaption><strong>2/3 · Botão direito durante o desenho › Parallel</strong><ol class="leg"><li><span class="mkl">1</span><span>Primeiro vértice já colocado (quadradinho vermelho).</span></li><li><span class="mkl">2</span><span><b>Parallel (P)</b>: o próximo lado fica paralelo à linha em que você clicar.</span></li></ol></figcaption></figure><figure class="slide"><div class="tela" style="max-width:793px"><img src="./img/edicao-arcgis/B06_perpendicular.png" alt="Botão direito durante o desenho › Perpendicular" width="793" height="363"><span class="mk" style="left:14.38%;top:35.26%">1</span><span class="mk" style="left:14.38%;top:57.58%">2</span><span class="mk" style="left:14.38%;top:87.88%">3</span></div><figcaption><strong>3/3 · Botão direito durante o desenho › Perpendicular</strong><ol class="leg"><li><span class="mkl">1</span><span><b>Perpendicular (E)</b>: o próximo lado fica a 90° da linha clicada.</span></li><li><span class="mkl">2</span><span><b>Reverse Direction</b>: inverte o sentido do desenho (passo 4).</span></li><li><span class="mkl">3</span><span><b>Finish (F2)</b>: conclui o desenho.</span></li></ol></figcaption></figure><div class="nav"><button type="button" class="ant" aria-label="Anterior">‹</button><div class="dots"><button type="button" class="dot ativo" aria-label="Tela 1" data-i="0"></button><button type="button" class="dot" aria-label="Tela 2" data-i="1"></button><button type="button" class="dot" aria-label="Tela 3" data-i="2"></button></div><button type="button" class="prox" aria-label="Próxima">›</button></div></div>
+    </div>
+  </details>
+
+  <details class="passo">
+    <summary><span class="num">3</span>Direction/Distance (G)<span class="seta">›</span></summary>
+    <div class="corpo">
+      <p>Quando você já tem as medidas — de um projeto aprovado ou de um memorial — digite cada lado como <b>direção + distância</b>. É o mesmo desenho do passo 2, agora sem depender de clicar em bordas.</p>
+      <ol class="passos">
+        <li>Template <b>Edificacoes</b> › <b>Polygon</b> › primeiro vértice com <kbd>F6</kbd> (mesmas coordenadas do passo 2).</li>
+        <li>Para cada lado: <kbd>G</kbd> › confira que a unidade é <b>NAz</b> › digite a direção e a distância da tabela › Enter.</li>
+        <li>Depois do 3º lado, <b>Finish</b> (<kbd>F2</kbd>).</li>
+      </ol>
+      <div class="tbl"><table>
+        <tr><th>Lado</th><th>Direction (NAz)</th><th>Distance</th><th>Em rumo seria…</th></tr>
+        <tr><td>1</td><td class="num">345-17-23</td><td class="num">10</td><td class="num">N 14°42'37" W</td></tr>
+        <tr><td>2</td><td class="num">75-17-23</td><td class="num">12</td><td class="num">N 75°17'23" E</td></tr>
+        <tr><td>3</td><td class="num">165-17-23</td><td class="num">10</td><td class="num">S 14°42'37" E</td></tr>
+        <tr><td>4</td><td colspan="3"><b>Finish (F2)</b> fecha sozinho</td></tr>
+      </table></div>
+      <p>O formato <span class="caminho">345-17-23</span> significa 345 graus, 17 minutos e 23 segundos.</p>
+      <div class="carrossel" id="b-c3"><figure class="slide ativo"><div class="tela" style="max-width:910px"><img src="./img/edicao-arcgis/B07_direction_distance_menu.png" alt="Botão direito durante o desenho › Direction/Distance" width="910" height="456"><span class="mk" style="left:13.96%;top:17.54%">1</span><span class="mk" style="left:13.96%;top:82.89%">2</span></div><figcaption><strong>1/2 · Botão direito durante o desenho › Direction/Distance</strong><ol class="leg"><li><span class="mkl">1</span><span><b>Direction/Distance (G)</b>: abre a caixa para digitar direção e distância.</span></li><li><span class="mkl">2</span><span><b>Finish (F2)</b>.</span></li></ol></figcaption></figure><figure class="slide"><div class="tela" style="max-width:797px"><img src="./img/edicao-arcgis/B08_direction_distance_dialogo.png" alt="A caixa Direction and Distance" width="797" height="489"><span class="mk" style="left:65.37%;top:58.08%">1</span><span class="mk" style="left:80.68%;top:53.78%">2</span><span class="mk" style="left:65.37%;top:64.62%">3</span><span class="mk" style="left:45.92%;top:23.72%">4</span></div><figcaption><strong>2/2 · A caixa Direction and Distance</strong><ol class="leg"><li><span class="mkl">1</span><span><b>Direction</b>: digite no formato graus-minutos-segundos (ex.: 345-17-23).</span></li><li><span class="mkl">2</span><span>Seletor do tipo de direção: deixe em <b>NAz</b> (veja o epílogo).</span></li><li><span class="mkl">3</span><span><b>Distance</b> em metros.</span></li><li><span class="mkl">4</span><span>O Pro mostra no mapa o ângulo e a distância atuais do cursor.</span></li></ol></figcaption></figure><div class="nav"><button type="button" class="ant" aria-label="Anterior">‹</button><div class="dots"><button type="button" class="dot ativo" aria-label="Tela 1" data-i="0"></button><button type="button" class="dot" aria-label="Tela 2" data-i="1"></button></div><button type="button" class="prox" aria-label="Próxima">›</button></div></div>
+      <h3>✅ Confira o resultado</h3>
+      <div class="carrossel" id="b-c4"><figure class="slide ativo"><div class="tela" style="max-width:1060px"><img src="./img/edicao-arcgis/B09_edificacao_attributes.png" alt="Edificação concluída e conferida" width="1060" height="740"><span class="mk" style="left:41.51%;top:40.54%">1</span><span class="mk" style="left:24.25%;top:97.84%">2</span></div><figcaption><strong>1/1 · Edificação concluída e conferida</strong><ol class="leg"><li><span class="mkl">1</span><span>Edificação desenhada dentro do lote V2.</span></li><li><span class="mkl">2</span><span><b>Shape_Area = 120,000532</b> m² — confere com 10 × 12 m. Shape_Length = 44,00 m.</span></li></ol></figcaption></figure></div>
+      <div class="confira"><b class="t">✅ Confira</b><ul>
+        <li>No painel Attributes (ou na tabela), <b>Shape_Area = 120,00 m²</b>.</li>
+        <li>O instrutor liga a camada de gabarito: o seu desenho cai <b>exatamente</b> sobre o contorno verde.</li>
+        <li>O desenho do passo 2 e o do passo 3 são idênticos.</li>
+      </ul></div>
+    </div>
+  </details>
+
+  <details class="passo">
+    <summary><span class="num">4</span>Reverse Direction (em linhas)<span class="seta">›</span></summary>
+    <div class="corpo">
+      <p>Numa linha, o desenho sempre continua a partir do <b>último</b> ponto. Se você precisa acrescentar trechos do <b>outro</b> lado, não recomece: inverta o sentido.</p>
+      <ol class="passos">
+        <li>Desenhando uma linha (por exemplo, um eixo em <b>Logradouros</b>), clique com o botão direito sobre um vértice do desenho.</li>
+        <li>Escolha <b>Reverse Direction</b>: o primeiro ponto vira o último.</li>
+        <li>Continue o desenho — agora ele cresce a partir da outra ponta. Termine com <b>Finish</b> (<kbd>F2</kbd>).</li>
+      </ol>
+      <div class="carrossel" id="b-c5"><figure class="slide ativo"><div class="tela" style="max-width:669px"><img src="./img/edicao-arcgis/B10_reverse_direction.png" alt="Botão direito sobre um vértice da linha" width="669" height="427"><span class="mk" style="left:66.07%;top:16.63%">1</span><span class="mk" style="left:16.74%;top:76.35%">2</span></div><figcaption><strong>1/1 · Botão direito sobre um vértice da linha</strong><ol class="leg"><li><span class="mkl">1</span><span>Último ponto do desenho: é daqui que ele continuaria.</span></li><li><span class="mkl">2</span><span><b>Reverse Direction</b>: o primeiro ponto vira o último.</span></li></ol></figcaption></figure></div>
+    </div>
+  </details>
+</div>
+
+<div class="parte">
+  <h3 class="sub"><span class="sub-n">B</span>Mão na massa</h3>
+  <div class="exercicio">
+    <h3>Exercício B1 — Configurar o snapping</h3>
+    <div class="meta-ex">⏱️ 5 min · Passo 1</div>
+    <div class="confira"><b class="t">✅ Confira</b><ul><li>Encostando o cursor num canto do V2, aparece a dica <b>Lotes : Vertex</b>.</li><li>Na aba do ímã, só as camadas do cadastro estão marcadas.</li></ul></div>
+  </div>
+  <div class="exercicio">
+    <h3>Exercício B2 — Edificação com Parallel e Perpendicular</h3>
+    <div class="meta-ex">⏱️ 15 min · Passo 2</div>
+    <p>Desenhe a edificação de 10 × 12 m no V2 seguindo o passo 2. Depois, <b>Discard › Yes</b>.</p>
+    <div class="confira"><b class="t">✅ Confira</b><ul><li>Shape_Area = <b>120,00 m²</b>.</li><li>Os lados acompanham a direção das divisas do lote.</li></ul></div>
+  </div>
+  <div class="exercicio">
+    <h3>Exercício B3 — A mesma edificação com Direction/Distance</h3>
+    <div class="meta-ex">⏱️ 15 min · Passo 3</div>
+    <p>Repita o desenho digitando direção e distância. Depois, <b>Discard › Yes</b>.</p>
+    <div class="confira"><b class="t">✅ Confira</b><ul><li>Shape_Area = <b>120,00 m²</b>, igual ao B2.</li><li>Se a edificação saiu torta ou para fora do lote, veja o <a href="#epilogo">epílogo</a>: você pode ter misturado rumo e azimute.</li></ul></div>
+  </div>
+  <div class="exercicio">
+    <h3>Exercício B4 — Inverter e continuar uma linha</h3>
+    <div class="meta-ex">⏱️ 10 min · Passo 4</div>
+    <p>Em Logradouros, desenhe uma linha de dois trechos, use <b>Reverse Direction</b> e acrescente um terceiro trecho pela ponta inicial. Termine com <b>Finish</b> e depois <b>Discard › Yes</b>.</p>
+    <div class="confira"><b class="t">✅ Confira</b><ul><li>O terceiro trecho saiu da ponta onde você <b>começou</b> a linha.</li></ul></div>
+  </div>
+
+  <div class="exercicio desafio">
+    <h3>🏆 DESAFIO — Desenhe um lote com área exata de 1 ha</h3>
+    <div class="meta-ex">⏱️ 15 min · Passos 2 e 3 · sem roteiro</div>
+    <p>Usando só o que você aprendeu neste bloco, desenhe na camada <b>Lotes</b> um polígono com <b>exatamente 1 hectare</b>, numa área livre do mapa. Escolha as medidas, as direções e as ferramentas. No fim, <b>Discard › Yes</b>.</p>
+    <details class="dica-desafio"><summary>💡 Dica 1 — quanto é 1 ha?</summary>
+      <p>1 hectare = <b>10.000 m²</b>. Qualquer retângulo cujos lados multiplicados deem 10.000 serve: 100 × 100, 80 × 125, 50 × 200…</p>
+    </details>
+    <details class="dica-desafio"><summary>💡 Dica 2 — por onde começar?</summary>
+      <p>Coloque o primeiro vértice com um clique (ou <kbd>F6</kbd>) e faça cada lado com <kbd>G</kbd>, digitando direção e distância. Três lados bastam: o quarto fecha com <b>Finish</b> (<kbd>F2</kbd>).</p>
+    </details>
+    <details class="dica-desafio"><summary>🔑 Uma solução possível (abra só depois de tentar)</summary>
+      <p><b>Nível 1 — alinhado ao Norte (100 × 100 m):</b> <kbd>G</kbd> <span class="caminho">0-00-00</span> / 100 › <kbd>G</kbd> <span class="caminho">90-00-00</span> / 100 › <kbd>G</kbd> <span class="caminho">180-00-00</span> / 100 › <kbd>F2</kbd>.</p>
+      <p><b>Nível 2 — alinhado com a quadra (80 × 125 m):</b> use as direções do passo 3. <kbd>G</kbd> <span class="caminho">75-17-23</span> / 125 › <kbd>G</kbd> <span class="caminho">165-17-23</span> / 80 › <kbd>G</kbd> <span class="caminho">255-17-23</span> / 125 › <kbd>F2</kbd>.</p>
+    </details>
+    <div class="confira"><b class="t">✅ Confira</b><ul>
+      <li>Shape_Area = <b>10.000,00 m²</b> (pequenas casas decimais, como 10.000,0005, são arredondamento e estão OK).</li>
+      <li>100 × 100 dá perímetro (Shape_Length) de <b>400 m</b>; 80 × 125 dá <b>410 m</b>. Mesma área, perímetros diferentes!</li>
+      <li>Deu 9.998 ou 10.012 m²? Algum lado não ficou exato: provavelmente o último vértice foi clicado em vez de fechado com <b>Finish</b>.</li>
+    </ul></div>
+  </div>
+</div>
+
+<div class="parte" id="epilogo">
+  <h3 class="sub"><span class="sub-n">📜</span>Epílogo — antes de digitalizar um memorial descritivo</h3>
+  <p class="lead">Nem todo lote se desenha encaixando no que já existe. Lote novo, de projeto ou de escritura, chega como um <b>memorial em PDF</b> — às vezes antigo, às vezes confuso — e precisa ser lançado com <kbd>G</kbd>. É aqui que acontece o erro mais caro do cadastro: <b>o lote sai com a forma e a área certas, só que girado ou espelhado</b>. Ninguém percebe olhando a tela.</p>
+
+  <h3>1. A mesma direção pode ser escrita de quatro jeitos</h3>
+  <div class="dois">
+    <div>
+      <p>O seletor ao lado do campo Direction define <b>como o Pro lê o número que você digita</b>. O mesmo lado da nossa edificação (o 1º, para o norte):</p>
+      <div class="tbl"><table>
+        <tr><th>No menu</th><th>Nome</th><th>Como se lê</th><th>Lado 1</th></tr>
+        <tr><td><b>NAz</b></td><td>Azimute</td><td>0° a 360°, horário, a partir do <b>Norte</b></td><td class="num">345°17'23"</td></tr>
+        <tr><td><b>SAz</b></td><td>Azimute Sul</td><td>0° a 360°, horário, a partir do <b>Sul</b></td><td class="num">165°17'23"</td></tr>
+        <tr><td><b>QB</b></td><td><b>Rumo</b></td><td>0° a 90°, com o quadrante</td><td class="num">N 14°42'37" W</td></tr>
+        <tr><td><b>P</b></td><td>Polar</td><td>anti-horário, a partir do <b>Leste</b></td><td class="num">104°42'37"</td></tr>
+      </table></div>
+    </div>
+    <div><div class="carrossel" id="b-c6"><figure class="slide ativo"><div class="tela" style="max-width:510px"><img src="./img/edicao-arcgis/E01_tipos_de_direcao.png" alt="O seletor de tipo de direção" width="510" height="334"><span class="mk" style="left:77.25%;top:42.51%">1</span><span class="mk" style="left:77.25%;top:58.08%">2</span><span class="mk" style="left:77.25%;top:71.86%">3</span><span class="mk" style="left:77.25%;top:86.23%">4</span></div><figcaption><strong>1/1 · O seletor de tipo de direção</strong><ol class="leg"><li><span class="mkl">1</span><span><b>NAz</b> — azimute a partir do Norte.</span></li><li><span class="mkl">2</span><span><b>SAz</b> — azimute a partir do Sul.</span></li><li><span class="mkl">3</span><span><b>P</b> — polar.</span></li><li><span class="mkl">4</span><span><b>QB</b> — rumo (quadrant bearing).</span></li></ol></figcaption></figure></div></div>
+  </div>
+
+  <h3>2. Rumo ou azimute? Olhe o memorial</h3>
+  <ul>
+    <li>Tem <b>letras de quadrante</b> (N…E, S…E, S…W, N…W) e o ângulo <b>nunca passa de 90°</b>? É <b>rumo</b>.</li>
+    <li>Vai até <b>360°</b> e não tem letras? É <b>azimute</b> (quase sempre a partir do Norte).</li>
+  </ul>
+  <p>Para trabalhar sempre em <b>NAz</b>, converta o rumo assim:</p>
+  <div class="tbl"><table>
+    <tr><th>Quadrante do rumo</th><th>Azimute (NAz)</th><th>Exemplo</th></tr>
+    <tr><td>N … E</td><td>= rumo</td><td class="num">N 75°17'23" E → 75°17'23"</td></tr>
+    <tr><td>S … E</td><td>= 180° − rumo</td><td class="num">S 14°42'37" E → 165°17'23"</td></tr>
+    <tr><td>S … W</td><td>= 180° + rumo</td><td class="num">S 75°17'23" W → 255°17'23"</td></tr>
+    <tr><td>N … W</td><td>= 360° − rumo</td><td class="num">N 14°42'37" W → 345°17'23"</td></tr>
+  </table></div>
+
+  <h3>3. A pegadinha, com números reais</h3>
+  <div class="dois">
+    <div>
+      <p>O memorial diz <b>N 14°42'37" W</b>. O técnico deixa o seletor em <b>NAz</b> e digita só o número: <span class="caminho">14-42-37</span>.</p>
+      <p>O Pro desenha o lado para <b>nor-nordeste</b> em vez de <b>nor-noroeste</b>: um desvio de <b>29°25'</b>. A área continua a mesma — o lote só está <b>no lugar errado</b>.</p>
+      <p>E o <b>contra-rumo</b>? É a mesma linha percorrida ao contrário: N 14°42'37" W vira <b>S 14°42'37" E</b>. Se o memorial descreve o perímetro num sentido e você lê no outro, o lote vira de ponta-cabeça.</p>
+    </div>
+    <div class="svgbox">
+      <svg viewBox="0 0 300 260" role="img" aria-label="Direção correta a 345 graus e direção errada a 14 graus">
+        <line x1="150" y1="235" x2="150" y2="20" stroke="#5b6b7b" stroke-dasharray="4 4"/>
+        <text x="150" y="14" text-anchor="middle" font-size="13" fill="#5b6b7b">N</text>
+        <line x1="150" y1="235" x2="98" y2="38" stroke="#1f7a4d" stroke-width="4"/>
+        <line x1="150" y1="235" x2="201" y2="38" stroke="#b42318" stroke-width="4" stroke-dasharray="8 5"/>
+        <path d="M 120 120 A 120 120 0 0 1 180 120" fill="none" stroke="#b45309" stroke-width="2"/>
+        <text x="150" y="112" text-anchor="middle" font-size="12" fill="#b45309">29°25'</text>
+        <text x="70" y="60" font-size="12" fill="#1f7a4d" text-anchor="middle">certo</text>
+        <text x="70" y="75" font-size="11" fill="#1f7a4d" text-anchor="middle">345°17'23"</text>
+        <text x="236" y="60" font-size="12" fill="#b42318" text-anchor="middle">errado</text>
+        <text x="236" y="75" font-size="11" fill="#b42318" text-anchor="middle">14°42'37"</text>
+        <circle cx="150" cy="235" r="5" fill="#0b4f6c"/>
+      </svg>
+    </div>
+  </div>
+
+  <h3>4. Checklist antes de digitalizar</h3>
+  <ol class="passos">
+    <li><b>Ponto de partida:</b> onde o memorial está amarrado (esquina, distância do alinhamento)? Comece por ele.</li>
+    <li><b>Tipo de direção:</b> rumo ou azimute? Converta para NAz antes de digitar.</li>
+    <li><b>Sentido do percurso:</b> horário ou anti-horário? Rumo ou <b>contra-rumo</b>?</li>
+    <li><b>Qual Norte:</b> memoriais antigos costumam usar o Norte <b>magnético da época</b> — e a declinação muda com os anos. Se o primeiro lado não acompanhar a rua, desconfie.</li>
+    <li><b>Unidades:</b> graus-minutos-segundos e metros. Documentos muito antigos podem trazer <b>braças</b> (≈ 2,2 m).</li>
+    <li><b>Fechamento e área:</b> o último ponto caiu no primeiro? A área bate com o memorial? Se não fechar, <b>pare e consulte</b> — nunca force o último ponto no primeiro.</li>
+  </ol>
+  <div class="box aviso"><strong class="t">⚠️ Antes de usar</strong>
+    <p>Na dúvida sobre como ler um memorial, consulte o responsável técnico <b>antes</b> de digitalizar. No Bloco C você vai lançar um lote inteiro a partir do memorial — com a versão certa e com a “pegadinha”.</p>
+  </div>
+</div>
+
+<div class="parte">
+  <h3 class="sub"><span class="sub-n">C</span>Teste rápido</h3>
+  <p class="lead">Quatro perguntas para fechar o bloco.</p>
+  <div id="quiz-b"></div>
+</div>
+
+<div class="parte">
+  <h3 class="sub"><span class="sub-n">D</span>Para aprofundar</h3>
+  <p>Documentação oficial: <a href="https://doc.esri.com/en/arcgis-pro/latest/help/editing/a-quick-tour-of-editing.html" target="_blank" rel="noopener">tour rápido pela edição no ArcGIS Pro</a> (seção da barra de construção e do menu de contexto).</p>
+  <p><b>Próximo bloco:</b> editar lotes — desmembrar, remembrar e unir.</p>
+</div>
+
+
+<div class="proximo"><a href="#bloco-a">← Bloco A</a><a href="#bloco-c">Bloco C →</a></div>
+</section>
+<hr>
+<section class="bloco" id="bloco-c">
+<h2>🧩 Bloco C — Editar lotes: desmembrar, remembrar, unir e lançar por memorial</h2>
+<p class="lead-bloco">As quatro operações que mais mudam o cadastro — feitas com medidas exatas e conferidas pela área.</p>
+<div class="chips"><span>👥 Técnicos iniciantes no ArcGIS Pro</span><span>⏱️ ~60 min</span><span>🗺️ Base de treino · quadra 101.014 · lote 101-014-0355-001</span></div>
+
+
+<div class="parte">
+  <div class="cenario">
+    <p><b>📍 Cenário</b> — Chegou à Prefeitura um pedido de <b>desmembramento</b> do lote <span class="caminho">101-014-0355-001</span> (30,00 × 38,50 m = 1.155,00 m²) em duas partes iguais. Depois, o proprietário desistiu e pediu o <b>remembramento</b>. Por fim, você vai relançar o mesmo lote a partir do <b>memorial descritivo</b> — e ver o que acontece quando um rumo é lido errado.</p>
+  </div>
+  <h3>Ao final deste bloco você vai saber</h3>
+  <ol class="passos">
+    <li>Dividir um lote em partes exatas com <b>Split</b>.</li>
+    <li>Juntar lotes com <b>Merge</b> e escolher qual deles doa os atributos.</li>
+    <li>Criar um lote novo a partir de outros, mantendo os originais.</li>
+    <li>Lançar um lote a partir do memorial, convertendo rumos para azimute.</li>
+  </ol>
+  <div class="regra"><b>⚠️ A regra que evita 90% dos erros com o G:</b> o <kbd>G</kbd> nunca começa sozinho — ele sempre parte do <b>último ponto colocado</b>. Antes de digitar direção e distância, confira <b>onde está o primeiro ponto</b>. Se usar coordenadas, o <kbd>F6</kbd> <b>é</b> o primeiro clique: não clique no mapa antes.</div>
+</div>
+
+<div class="parte">
+  <h3 class="sub"><span class="sub-n">A</span>Passo a passo</h3>
+  <div class="controles"><button type="button" class="abrir">Expandir todos</button><button type="button" class="fechar">Recolher todos</button></div>
+
+  <details class="passo" open>
+    <summary><span class="num">1</span>Desmembrar com Split<span class="seta">›</span></summary>
+    <div class="corpo">
+      <p>A nova divisa nasce no <b>meio da testada</b> e segue paralela às laterais até passar do fundo do lote.</p>
+      <ol class="passos">
+        <li>Selecione o lote <span class="caminho">101-014-0355-001</span> › <b>Modify Features › Split</b>.</li>
+        <li>No menu do <b>Snapping</b>, ligue o modo <b>Midpoint</b> (o triângulo).</li>
+        <li><b>Primeiro clique:</b> encoste o cursor na testada (o lado de 30 m, junto à rua de cima) até aparecer <b>Lotes : Midpoint</b> — e clique.</li>
+        <li><kbd>G</kbd> › <span class="caminho">165-17-23</span> / <b>42</b> › Enter. Os 42 m garantem que a linha passe do fundo (o lote tem 38,50 m).</li>
+        <li><b>Finish</b> (<kbd>F2</kbd>).</li>
+      </ol>
+      <div class="carrossel" id="c-c1"><figure class="slide ativo"><div class="tela" style="max-width:1607px"><img src="./img/edicao-arcgis/C01_split_painel.png" alt="Modify Features › Split" width="1607" height="858"><span class="mk" style="left:63.60%;top:3.50%">1</span><span class="mk" style="left:67.21%;top:32.17%">2</span><span class="mk" style="left:34.23%;top:60.61%">3</span></div><figcaption><strong>1/5 · Modify Features › Split</strong><ol class="leg"><li><span class="mkl">1</span><span><b>Split</b> na guia Edit (ou em Modify Features › Divide).</span></li><li><span class="mkl">2</span><span>O lote selecionado aparece listado no painel.</span></li><li><span class="mkl">3</span><span>Lote 101-014-0355-001 selecionado (contorno ciano).</span></li></ol></figcaption></figure><figure class="slide"><div class="tela" style="max-width:995px"><img src="./img/edicao-arcgis/C02a_midpoint.png" alt="O primeiro clique no meio da testada" width="995" height="773"><span class="mk" style="left:32.46%;top:16.04%">1</span><span class="mk" style="left:38.99%;top:52.26%">2</span></div><figcaption><strong>2/5 · O primeiro clique no meio da testada</strong><ol class="leg"><li><span class="mkl">1</span><span>Modo <b>Midpoint</b> ligado no menu do Snapping.</span></li><li><span class="mkl">2</span><span>Primeiro clique: a dica <b>Lotes : Midpoint</b> aparece no meio da testada.</span></li></ol></figcaption></figure><figure class="slide"><div class="tela" style="max-width:1161px"><img src="./img/edicao-arcgis/C02b_split_linha_G.png" alt="A divisa com Direction/Distance" width="1161" height="751"><span class="mk" style="left:34.28%;top:33.82%">1</span><span class="mk" style="left:59.95%;top:40.48%">2</span><span class="mk" style="left:59.95%;top:44.74%">3</span></div><figcaption><strong>3/5 · A divisa com Direction/Distance</strong><ol class="leg"><li><span class="mkl">1</span><span>O primeiro ponto, no meio da testada.</span></li><li><span class="mkl">2</span><span><b>G</b>: direção <b>165-17-23</b> (paralela às laterais).</span></li><li><span class="mkl">3</span><span>Distância <b>42</b> m — passa do fundo do lote.</span></li></ol></figcaption></figure><figure class="slide"><div class="tela" style="max-width:1062px"><img src="./img/edicao-arcgis/C02c_finish.png" alt="Finish conclui o corte" width="1062" height="731"><span class="mk" style="left:41.81%;top:64.71%">1</span><span class="mk" style="left:40.58%;top:76.06%">2</span></div><figcaption><strong>4/5 · Finish conclui o corte</strong><ol class="leg"><li><span class="mkl">1</span><span><b>Finish (F2)</b> aplica o corte.</span></li><li><span class="mkl">2</span><span>A linha terminou além do fundo do lote — o corte atravessa o lote inteiro.</span></li></ol></figcaption></figure><figure class="slide"><div class="tela" style="max-width:686px"><img src="./img/edicao-arcgis/C03_desmembrado.png" alt="Resultado na tabela de atributos" width="686" height="520"><span class="mk" style="left:41.25%;top:41.35%">1</span><span class="mk" style="left:45.48%;top:94.81%">2</span><span class="mk" style="left:97.08%;top:94.81%">3</span></div><figcaption><strong>5/5 · Resultado na tabela de atributos</strong><ol class="leg"><li><span class="mkl">1</span><span>O lote virou <b>duas partes</b>, separadas pela nova divisa.</span></li><li><span class="mkl">2</span><span>As duas partes com a <b>mesma inscrição</b> — o Split copia os atributos.</span></li><li><span class="mkl">3</span><span><b>Shape_Area = 577,50</b> m² em cada parte.</span></li></ol></figcaption></figure><div class="nav"><button type="button" class="ant" aria-label="Anterior">‹</button><div class="dots"><button type="button" class="dot ativo" aria-label="Tela 1" data-i="0"></button><button type="button" class="dot" aria-label="Tela 2" data-i="1"></button><button type="button" class="dot" aria-label="Tela 3" data-i="2"></button><button type="button" class="dot" aria-label="Tela 4" data-i="3"></button><button type="button" class="dot" aria-label="Tela 5" data-i="4"></button></div><button type="button" class="prox" aria-label="Próxima">›</button></div></div>
+      <div class="confira"><b class="t">✅ Confira</b><ul><li>Duas partes com <b>577,50 m²</b> cada (15,00 × 38,50 m).</li><li>Shape_Length de cada parte ≈ <b>107,00 m</b>.</li></ul></div>
+      <div class="box aviso"><strong class="t">⚠️ O Split divide o desenho, não o cadastro</strong>
+        <p>Repare na tabela: as duas partes ficaram com a <b>mesma inscrição</b> e com AR_AREA_TE = 1155. Os atributos foram copiados. Atualizar inscrição e área de cada novo lote é assunto do Bloco D.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="passo">
+    <summary><span class="num">2</span>Remembrar com Merge<span class="seta">›</span></summary>
+    <div class="corpo">
+      <ol class="passos">
+        <li>Selecione as duas partes › <b>Modify Features › Merge</b>, aba <b>Existing Feature</b>.</li>
+        <li>Em <b>Features to merge</b>, clique no lote que vai <b>doar os atributos</b> — ele recebe a marca <b>(preserve)</b>. Confira os valores em <b>Merged Feature Attributes</b>.</li>
+        <li>Clique em <b>Merge</b>.</li>
+      </ol>
+      <div class="carrossel" id="c-c2"><figure class="slide ativo"><div class="tela" style="max-width:992px"><img src="./img/edicao-arcgis/C04_merge_painel.png" alt="Modify Features › Merge" width="992" height="870"><span class="mk" style="left:57.26%;top:9.20%">1</span><span class="mk" style="left:86.49%;top:26.32%">2</span><span class="mk" style="left:89.72%;top:97.13%">3</span></div><figcaption><strong>1/2 · Modify Features › Merge</strong><ol class="leg"><li><span class="mkl">1</span><span>Aba <b>Existing Feature</b> = remembrar.</span></li><li><span class="mkl">2</span><span><b>(preserve)</b>: este lote continua existindo e doa os atributos.</span></li><li><span class="mkl">3</span><span>Botão <b>Merge</b>.</span></li></ol></figcaption></figure><figure class="slide"><div class="tela" style="max-width:1046px"><img src="./img/edicao-arcgis/C05_remembrado.png" alt="Lote remembrado" width="1046" height="858"><span class="mk" style="left:55.93%;top:10.61%">1</span><span class="mk" style="left:47.80%;top:92.89%">2</span></div><figcaption><strong>2/2 · Lote remembrado</strong><ol class="leg"><li><span class="mkl">1</span><span><b>Merge Features completed</b>.</span></li><li><span class="mkl">2</span><span>Um lote só, com <b>1.155,00</b> m².</span></li></ol></figcaption></figure><div class="nav"><button type="button" class="ant" aria-label="Anterior">‹</button><div class="dots"><button type="button" class="dot ativo" aria-label="Tela 1" data-i="0"></button><button type="button" class="dot" aria-label="Tela 2" data-i="1"></button></div><button type="button" class="prox" aria-label="Próxima">›</button></div></div>
+      <div class="confira"><b class="t">✅ Confira</b><ul><li>Um único lote com <b>1.155,00 m²</b> (pequenas casas decimais são arredondamento).</li><li>A mensagem <b>Merge Features completed</b> aparece no painel.</li></ul></div>
+      <div class="box dica"><strong class="t">💡 O que significa “(preserve)”</strong>
+        <p>Na aba Existing Feature, <b>(preserve)</b> marca qual lote <b>continua existindo</b> com os seus atributos; os outros são incorporados a ele e deixam de existir.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="passo">
+    <summary><span class="num">3</span>Unir mantendo os originais<span class="seta">›</span></summary>
+    <div class="corpo">
+      <p>Às vezes é preciso criar um <b>lote novo</b> a partir de outros sem apagar os de origem — por exemplo, para simular um projeto antes de aprová-lo.</p>
+      <ol class="passos">
+        <li>Refaça o desmembramento do passo 1 (ou desfaça o Merge com <kbd>Ctrl</kbd>+<kbd>Z</kbd>).</li>
+        <li>Selecione as duas partes › <b>Merge</b> › aba <b>New Feature</b>. Escolha a camada de destino e confira as opções do painel.</li>
+        <li>Clique em <b>Merge</b>.</li>
+      </ol>
+      <div class="confira"><b class="t">✅ Confira pela tabela</b><ul><li>Se a tabela mostrar <b>3 registros</b> — duas partes de 577,50 m² e um lote novo de 1.155,00 m² — os originais foram mantidos.</li><li>Se mostrar só 1 registro, os originais foram consumidos: <kbd>Ctrl</kbd>+<kbd>Z</kbd> e revise as opções da aba New Feature.</li></ul></div>
+    </div>
+  </details>
+
+  <details class="passo">
+    <summary><span class="num">4</span>Lançar um lote pelo memorial<span class="seta">›</span></summary>
+    <div class="corpo">
+      <p>O memorial do lote chegou em <b>rumos</b>. Converta cada lado para azimute (NAz) com a tabela do epílogo do Bloco B e lance na camada <b>Lotes</b>.</p>
+      <div class="tbl"><table>
+        <tr><th>Trecho</th><th>No memorial (rumo)</th><th>Converta para NAz</th><th>Distância</th></tr>
+        <tr><td>Ponto inicial P1</td><td colspan="3">E 453181,03 · N 7395236,13 (digite com <kbd>F6</kbd>)</td></tr>
+        <tr><td>P1 → P2</td><td class="num">S 14°42'37" E</td><td class="num">165-17-23</td><td class="num">38,50</td></tr>
+        <tr><td>P2 → P3</td><td class="num">S 75°17'23" W</td><td class="num">255-17-23</td><td class="num">30,00</td></tr>
+        <tr><td>P3 → P4</td><td class="num">N 14°42'37" W</td><td class="num">345-17-23</td><td class="num">38,50</td></tr>
+        <tr><td>P4 → P1</td><td class="num">N 75°17'24" E</td><td colspan="2"><b>Finish</b> (<kbd>F2</kbd>) fecha sozinho</td></tr>
+      </table></div>
+      <ol class="passos">
+        <li>Create Features › template <b>Lotes</b> › ferramenta <b>Polygon</b>.</li>
+        <li><kbd>F6</kbd> › coordenadas do P1 › Enter. <b>Não clique no mapa antes.</b></li>
+        <li>Para cada lado: <kbd>G</kbd> › direção em NAz › distância › Enter.</li>
+        <li><b>Finish</b> (<kbd>F2</kbd>).</li>
+      </ol>
+      <div class="carrossel" id="c-c3"><figure class="slide ativo"><div class="tela" style="max-width:1022px"><img src="./img/edicao-arcgis/C08_memorial_G.png" alt="Lançando o 1º lado do memorial" width="1022" height="609"><span class="mk" style="left:72.99%;top:58.29%">1</span><span class="mk" style="left:20.55%;top:47.45%">2</span><span class="mk" style="left:38.75%;top:55.99%">3</span></div><figcaption><strong>1/3 · Lançando o 1º lado do memorial</strong><ol class="leg"><li><span class="mkl">1</span><span>Template <b>Lotes</b>, ferramenta Polygon.</span></li><li><span class="mkl">2</span><span>P1 colocado com <b>F6</b> (coordenadas do memorial).</span></li><li><span class="mkl">3</span><span>1º lado: <b>165-17-23</b> / <b>38,50</b> (S 14°42'37" E convertido para NAz).</span></li></ol></figcaption></figure><figure class="slide"><div class="tela" style="max-width:1294px"><img src="./img/edicao-arcgis/C09_memorial_resultado.png" alt="Lote lançado e conferido" width="1294" height="533"><span class="mk" style="left:52.40%;top:28.33%">1</span><span class="mk" style="left:94.44%;top:93.06%">2</span><span class="mk" style="left:8.35%;top:93.06%">3</span></div><figcaption><strong>2/3 · Lote lançado e conferido</strong><ol class="leg"><li><span class="mkl">1</span><span>Lote lançado pelo memorial, em cima do original.</span></li><li><span class="mkl">2</span><span><b>Shape_Area ≈ 1.155</b> m² — dentro da tolerância.</span></li><li><span class="mkl">3</span><span>Atributos vazios (<b>&lt;Null&gt;</b>): o lote nasce sem dados cadastrais.</span></li></ol></figcaption></figure><figure class="slide"><div class="tela" style="max-width:1266px"><img src="./img/edicao-arcgis/C10_memorial_pegadinha.png" alt="A pegadinha do contra-rumo" width="1266" height="773"><span class="mk" style="left:48.03%;top:31.82%">1</span><span class="mk" style="left:37.76%;top:13.32%">2</span></div><figcaption><strong>3/3 · A pegadinha do contra-rumo</strong><ol class="leg"><li><span class="mkl">1</span><span>2º lado digitado como <b>75-17-23</b> (contra-rumo) em vez de 255-17-23.</span></li><li><span class="mkl">2</span><span>O Pro mostra a direção: o lado vai para <b>leste</b> — o lote vai sair espelhado.</span></li></ol></figcaption></figure><div class="nav"><button type="button" class="ant" aria-label="Anterior">‹</button><div class="dots"><button type="button" class="dot ativo" aria-label="Tela 1" data-i="0"></button><button type="button" class="dot" aria-label="Tela 2" data-i="1"></button><button type="button" class="dot" aria-label="Tela 3" data-i="2"></button></div><button type="button" class="prox" aria-label="Próxima">›</button></div></div>
+      <div class="confira"><b class="t">✅ Confira</b><ul>
+        <li>Shape_Area entre <b>1.154,8 e 1.155,2 m²</b>. Fora dessa faixa, confira lado a lado o que foi digitado.</li>
+        <li>O lote lançado cai em cima do lote original.</li>
+        <li>Os atributos nascem vazios (<b>&lt;Null&gt;</b>) — o preenchimento é assunto do Bloco D.</li>
+      </ul></div>
+
+      <h3>A pegadinha: um contra-rumo no 2º lado</h3>
+      <div class="dois">
+        <div>
+          <p>O técnico lê o 2º lado como <b>N 75°17'23" E</b> (o contra-rumo) e digita <span class="caminho">75-17-23</span> em vez de <span class="caminho">255-17-23</span>. O Pro obedece: o lado vai para <b>leste</b> em vez de oeste.</p>
+          <p>O lote fecha, a área continua <b>1.155 m²</b> — mas ele aparece <b>espelhado</b>, em cima do lote vizinho. Só quem olha o desenho percebe.</p>
+          <p><b>Lição:</b> área certa <b>não</b> prova que o lançamento está certo. Confira também a <b>posição</b>.</p>
+        </div>
+        <div class="svgbox">
+          <svg viewBox="0 0 320 260" role="img" aria-label="Lote correto a oeste do ponto inicial e lote errado espelhado a leste">
+            <g transform="rotate(-15 160 70)">
+              <rect x="70" y="70" width="90" height="116" fill="#e7f6ee" stroke="#1f7a4d" stroke-width="3"/>
+              <rect x="160" y="70" width="90" height="116" fill="#fdecea" stroke="#b42318" stroke-width="3" stroke-dasharray="8 5"/>
+              <text x="115" y="132" text-anchor="middle" font-size="13" fill="#1f7a4d">certo</text>
+              <text x="205" y="132" text-anchor="middle" font-size="13" fill="#b42318">espelhado</text>
+            </g>
+            <circle cx="160" cy="70" r="6" fill="#0b4f6c"/>
+            <text x="166" y="58" font-size="13" fill="#0b4f6c">P1</text>
+            <text x="160" y="245" text-anchor="middle" font-size="12" fill="#5b6b7b">2º lado: 255-17-23 (certo) × 75-17-23 (contra-rumo)</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </details>
+</div>
+
+<div class="parte">
+  <h3 class="sub"><span class="sub-n">B</span>Mão na massa</h3>
+  <div class="exercicio">
+    <h3>Exercício C1 — Desmembrar em duas partes iguais</h3>
+    <div class="meta-ex">⏱️ 15 min · Passo 1</div>
+    <div class="confira"><b class="t">✅ Confira</b><ul><li>2 × <b>577,50 m²</b>.</li></ul></div>
+  </div>
+  <div class="exercicio">
+    <h3>Exercício C2 — Remembrar as duas partes</h3>
+    <div class="meta-ex">⏱️ 10 min · Passo 2 · continue do C1, sem salvar</div>
+    <div class="confira"><b class="t">✅ Confira</b><ul><li>1 lote de <b>1.155,00 m²</b>. Depois, <b>Discard › Yes</b>.</li></ul></div>
+  </div>
+  <div class="exercicio">
+    <h3>Exercício C3 — Unir mantendo os originais</h3>
+    <div class="meta-ex">⏱️ 10 min · Passo 3</div>
+    <div class="confira"><b class="t">✅ Confira</b><ul><li><b>3 registros</b> na tabela. Depois, <b>Discard › Yes</b>.</li></ul></div>
+  </div>
+  <div class="exercicio">
+    <h3>Exercício C4 — Lançar pelo memorial (e errar de propósito)</h3>
+    <div class="meta-ex">⏱️ 20 min · Passo 4</div>
+    <p>Lance o lote pelo memorial. Depois, <b>Discard › Yes</b> e lance de novo trocando o 2º lado pelo contra-rumo (<span class="caminho">75-17-23</span>).</p>
+    <div class="confira"><b class="t">✅ Confira</b><ul><li>1ª vez: ≈ <b>1.155 m²</b>, em cima do lote original.</li><li>2ª vez: mesma área, lote <b>espelhado</b> para o leste. No fim, <b>Discard › Yes</b>.</li></ul></div>
+  </div>
+</div>
+
+<div class="parte">
+  <h3 class="sub"><span class="sub-n">C</span>Teste rápido</h3>
+  <p class="lead">Quatro perguntas para fechar o bloco.</p>
+  <div id="quiz-c"></div>
+</div>
+
+<div class="parte">
+  <h3 class="sub"><span class="sub-n">D</span>Para aprofundar</h3>
+  <p>Documentação oficial: <a href="https://doc.esri.com/en/arcgis-pro/latest/help/editing/a-quick-tour-of-editing.html" target="_blank" rel="noopener">tour rápido pela edição no ArcGIS Pro</a> (painel Modify Features).</p>
+  <p><b>Próximo bloco:</b> atributos — atualizar a inscrição e a área depois de desmembrar, preencher lotes novos e desconfiar de áreas que não batem.</p>
+</div>
+
+
+<div class="proximo"><a href="#bloco-b">← Bloco B</a><a href="#bloco-d">Bloco D →</a></div>
+</section>
+<hr>
+<section class="bloco" id="bloco-d">
+<h2>🗂️ Bloco D — Atributos: o cadastro por trás do desenho</h2>
+<p class="lead-bloco">Desenho certo com dado errado continua sendo cadastro errado. Depois de cada edição, os atributos precisam acompanhar a geometria.</p>
+<div class="chips"><span>👥 Técnicos iniciantes no ArcGIS Pro</span><span>⏱️ ~45 min</span><span>🗺️ Base de treino · quadra 101.014</span></div>
+
+
+<div class="parte">
+  <div class="cenario">
+    <p><b>📍 Cenário</b> — O desmembramento do Bloco C deixou o cadastro inconsistente: as duas partes do lote <span class="caminho">101-014-0355-001</span> têm a <b>mesma inscrição</b> e a mesma área cadastral de <b>1155 m²</b>, embora cada uma meça 577,50 m². Você vai corrigir isso — e aprender a procurar outros lotes com o mesmo problema.</p>
+  </div>
+  <h3>Ao final deste bloco você vai saber</h3>
+  <ol class="passos">
+    <li>Ler os atributos de vários lotes selecionados.</li>
+    <li>Corrigir um campo de um lote no painel <b>Attributes</b>.</li>
+    <li>Calcular um campo em vários lotes de uma vez com <b>Calculate Field</b>.</li>
+    <li>Copiar atributos de um lote para outro com <b>Transfer Attributes</b>.</li>
+    <li>Encontrar lotes cuja área cadastral não bate com o desenho.</li>
+  </ol>
+</div>
+
+<div class="parte">
+  <h3 class="sub"><span class="sub-n">A</span>Passo a passo</h3>
+  <div class="controles"><button type="button" class="abrir">Expandir todos</button><button type="button" class="fechar">Recolher todos</button></div>
+
+  <details class="passo" open>
+    <summary><span class="num">1</span>Ler os atributos de vários lotes<span class="seta">›</span></summary>
+    <div class="corpo">
+      <ol class="passos">
+        <li>Refaça o desmembramento do Bloco C (exercício C1), sem salvar.</li>
+        <li>Selecione as duas partes e abra o painel <b>Attributes</b>.</li>
+        <li>No topo do painel aparecem as duas feições. Clique em cada uma para ver os dados dela embaixo.</li>
+      </ol>
+      <div class="carrossel" id="d-c1"><figure class="slide ativo"><div class="tela" style="max-width:1457px"><img src="./img/edicao-arcgis/D01_atributos_duas_metades.png" alt="Duas partes selecionadas no painel Attributes" width="1457" height="860"><span class="mk" style="left:59.51%;top:14.77%">1</span><span class="mk" style="left:77.21%;top:50.58%">2</span><span class="mk" style="left:77.21%;top:78.84%">3</span><span class="mk" style="left:77.21%;top:88.26%">4</span></div><figcaption><strong>1/1 · Duas partes selecionadas no painel Attributes</strong><ol class="leg"><li><span class="mkl">1</span><span><b>Lotes (2)</b>: as duas partes listadas — clique em cada uma para ver os dados dela.</span></li><li><span class="mkl">2</span><span><b>inscricao</b> igual nas duas partes.</span></li><li><span class="mkl">3</span><span><b>AR_AREA_TE = 1155</b>: a área do lote antigo, copiada pelo Split.</span></li><li><span class="mkl">4</span><span><b>Shape_Area = 577,50</b>: a área real de cada parte.</span></li></ol></figcaption></figure></div>
+      <div class="box aviso"><strong class="t">⚠️ O que está errado</strong>
+        <p>As duas partes têm a mesma <b>inscricao</b> e o mesmo <b>AR_AREA_TE = 1155</b>. Mas o <b>Shape_Area</b> — a área calculada pelo desenho — mostra 577,50 m² em cada uma.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="passo">
+    <summary><span class="num">2</span>Corrigir um lote no painel Attributes<span class="seta">›</span></summary>
+    <div class="corpo">
+      <ol class="passos">
+        <li>No topo do painel, clique em <b>uma</b> das partes. Só ela fica destacada no mapa.</li>
+        <li>Clique no valor de <b>inscricao</b> e digite a nova inscrição. No treino, use <span class="caminho">101-014-0355-002</span>; no dia a dia, siga a regra de numeração da Prefeitura.</li>
+        <li>Clique em <b>Apply</b>. Com o <b>Auto Apply</b> desligado, nada é gravado no lote até você clicar em Apply.</li>
+      </ol>
+      <div class="carrossel" id="d-c2"><figure class="slide ativo"><div class="tela" style="max-width:1234px"><img src="./img/edicao-arcgis/D02_editar_inscricao.png" alt="Corrigindo a inscrição de uma parte" width="1234" height="850"><span class="mk" style="left:22.93%;top:40.47%">1</span><span class="mk" style="left:82.90%;top:52.24%">2</span><span class="mk" style="left:96.68%;top:95.76%">3</span></div><figcaption><strong>1/1 · Corrigindo a inscrição de uma parte</strong><ol class="leg"><li><span class="mkl">1</span><span>Só a parte clicada fica destacada.</span></li><li><span class="mkl">2</span><span>Nova inscrição digitada: <b>101-014-0355-002</b>.</span></li><li><span class="mkl">3</span><span><b>Apply</b> grava a alteração no lote.</span></li></ol></figcaption></figure></div>
+    </div>
+  </details>
+
+  <details class="passo">
+    <summary><span class="num">3</span>Calcular vários lotes de uma vez<span class="seta">›</span></summary>
+    <div class="corpo">
+      <p>A área cadastral das duas partes precisa ser a área do desenho. Em vez de digitar lote por lote, calcule.</p>
+      <ol class="passos">
+        <li>Selecione as duas partes e abra a tabela de atributos da camada <b>Lotes</b>.</li>
+        <li>Na tabela, clique em <b>Calculate</b>.</li>
+        <li>Confira que <b>Use the selected records</b> está ligado e mostra <b>2</b>.</li>
+        <li>Field Name: <b>ar_area_te</b> · Expression Type: <b>Python</b>.</li>
+        <li>Expressão: <span class="caminho">round(!Shape_Area!, 2)</span> — a área do desenho, com 2 casas decimais.</li>
+        <li><b>OK</b>.</li>
+      </ol>
+      <div class="carrossel" id="d-c3"><figure class="slide ativo"><div class="tela" style="max-width:1373px"><img src="./img/edicao-arcgis/D03_calculate_field.png" alt="Calculate Field nas duas partes" width="1373" height="742"><span class="mk" style="left:50.98%;top:29.78%">1</span><span class="mk" style="left:50.98%;top:36.66%">2</span><span class="mk" style="left:50.98%;top:81.00%">3</span><span class="mk" style="left:84.12%;top:95.55%">4</span></div><figcaption><strong>1/1 · Calculate Field nas duas partes</strong><ol class="leg"><li><span class="mkl">1</span><span><b>Use the selected records: 2</b> — o cálculo só atinge as duas partes.</span></li><li><span class="mkl">2</span><span>Campo existente: <b>ar_area_te</b>.</span></li><li><span class="mkl">3</span><span>Expressão: <b>round(!Shape_Area!, 2)</b>.</span></li><li><span class="mkl">4</span><span><b>OK</b> aplica o cálculo.</span></li></ol></figcaption></figure></div>
+      <div class="confira"><b class="t">✅ Confira</b><ul><li><b>AR_AREA_TE = 577,5</b> nas duas partes.</li></ul></div>
+      <div class="box perigo"><strong class="t">🛑 Três cuidados com o Calculate Field</strong>
+        <p><b>1. Use the selected records ligado.</b> Desligado, o cálculo roda em <b>todos os 5.020 lotes</b> da camada.</p>
+        <p><b>2. Escolha um campo que já existe.</b> Se você digitar um nome novo, o Pro <b>cria um campo</b> na camada — e esse campo não some com o Discard.</p>
+        <p><b>3. Leia a expressão antes do OK.</b> <span class="caminho">round(!Shape_Area!, 2)</span> arredonda a área. Já <span class="caminho">math.pow(!Shape_Area!, 2)</span> eleva a área ao quadrado: 577,50 viraria 333.506,25.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="passo">
+    <summary><span class="num">4</span>Copiar atributos com Transfer Attributes<span class="seta">›</span></summary>
+    <div class="corpo">
+      <p>O lote lançado pelo memorial no Bloco C nasceu com todos os atributos vazios (<b>&lt;Null&gt;</b>). Em vez de digitar campo por campo, copie-os de um lote que já tem os dados.</p>
+      <ol class="passos">
+        <li>Relance o lote pelo memorial (exercício C4), sem salvar.</li>
+        <li><b>Modify Features › Attributes › Transfer Attributes</b>.</li>
+        <li>Na primeira vez, o Pro pede o <b>mapeamento de campos</b>: camada de origem e de destino = <b>Lotes</b>; marque os campos a copiar (inscrição, situação, logradouro, bairro, ocupação, zoneamento…).</li>
+        <li>Clique no lote <b>de origem</b> (o que tem os dados) e depois no lote <b>de destino</b> (o dos &lt;Null&gt;).</li>
+        <li>Corrija o que não deve ser copiado — a inscrição e a área — como nos passos 2 e 3.</li>
+      </ol>
+      <div class="confira"><b class="t">✅ Confira</b><ul><li>O lote lançado deixa de ter &lt;Null&gt; nos campos mapeados.</li><li>Inscrição e área foram revisadas depois da cópia.</li></ul></div>
+    </div>
+  </details>
+
+  <details class="passo">
+    <summary><span class="num">5</span>Desconfiar de áreas que não batem<span class="seta">›</span></summary>
+    <div class="corpo">
+      <p>O lote vago V2 (<span class="caminho">101-014-0240-001</span>) mede <b>406,48 m²</b> no desenho, mas o cadastro diz <b>375 m²</b> — 8% a mais. Quantos lotes estão assim?</p>
+      <ol class="passos">
+        <li>Guia <b>Map › Select By Attributes</b> › camada <b>Lotes</b>.</li>
+        <li>Mude para o modo <b>SQL</b> e cole:<br><span class="caminho">Shape_Area &gt; AR_AREA_TE * 1.05 Or Shape_Area &lt; AR_AREA_TE * 0.95</span></li>
+        <li><b>OK</b> e veja quantos lotes ficaram selecionados (rodapé da tabela).</li>
+      </ol>
+      <div class="confira"><b class="t">✅ Confira</b><ul><li>O V2 está entre os selecionados.</li></ul></div>
+      <div class="box info"><strong class="t">🗺️ Como ler o resultado</strong>
+        <p>A expressão separa lotes com diferença maior que 5% entre o desenho e o cadastro. Nem todos são erro: lotes de condomínio, em que várias inscrições dividem o mesmo polígono, também podem aparecer. A lista é um ponto de partida para conferência, não uma lista de correções automáticas.</p>
+      </div>
+    </div>
+  </details>
+
+  <h3>Resumo: o fluxo completo de um desmembramento</h3>
+  <ol class="passos">
+    <li><b>Split</b> com o primeiro ponto no lugar certo (Bloco C).</li>
+    <li>Conferir as áreas pelo <b>Shape_Area</b>.</li>
+    <li>Corrigir a <b>inscrição</b> de cada parte no Attributes.</li>
+    <li>Atualizar a <b>área cadastral</b> com Calculate Field (só nos selecionados).</li>
+    <li><b>Save</b>.</li>
+  </ol>
+</div>
+
+<div class="parte">
+  <h3 class="sub"><span class="sub-n">B</span>Mão na massa</h3>
+  <div class="exercicio">
+    <h3>Exercício D1 — Nova inscrição</h3>
+    <div class="meta-ex">⏱️ 5 min · Passo 2</div>
+    <div class="confira"><b class="t">✅ Confira</b><ul><li>Uma parte com <b>…-001</b> e a outra com <b>…-002</b>.</li></ul></div>
+  </div>
+  <div class="exercicio">
+    <h3>Exercício D2 — Área cadastral das duas partes</h3>
+    <div class="meta-ex">⏱️ 10 min · Passo 3</div>
+    <div class="confira"><b class="t">✅ Confira</b><ul><li><b>577,5</b> nas duas. Nenhum outro lote foi alterado. Depois, <b>Discard › Yes</b>.</li></ul></div>
+  </div>
+  <div class="exercicio">
+    <h3>Exercício D3 — Preencher o lote do memorial</h3>
+    <div class="meta-ex">⏱️ 15 min · Passo 4</div>
+    <div class="confira"><b class="t">✅ Confira</b><ul><li>Sem &lt;Null&gt; nos campos mapeados; inscrição e área revisadas. Depois, <b>Discard › Yes</b>.</li></ul></div>
+  </div>
+  <div class="exercicio">
+    <h3>Exercício D4 — Caça às áreas divergentes</h3>
+    <div class="meta-ex">⏱️ 10 min · Passo 5</div>
+    <p>Rode a seleção, anote quantos lotes apareceram e escolha três para olhar no mapa: são erro de desenho, de cadastro ou condomínio?</p>
+    <div class="confira"><b class="t">✅ Confira</b><ul><li>O V2 está na seleção. Nada foi editado neste exercício.</li></ul></div>
+  </div>
+</div>
+
+<div class="parte">
+  <h3 class="sub"><span class="sub-n">C</span>Teste rápido</h3>
+  <p class="lead">Quatro perguntas para fechar o tutorial.</p>
+  <div id="quiz-d"></div>
+</div>
+
+
+<div class="proximo"><a href="#bloco-c">← Bloco C</a><a href="#atalhos">Atalhos e glossário →</a></div>
+</section>
+
+    <hr>
+
+    <section class="bloco" id="atalhos">
+      <h2>⌨️ Atalhos e glossário</h2>
+      <h3>Atalhos usados no tutorial</h3>
+      <div class="tbl"><table>
+        <tr><th>Tecla</th><th>O que faz</th><th>Bloco</th></tr>
+        <tr><td><kbd>Barra de espaço</kbd></td><td>Suspende o snapping enquanto estiver pressionada</td><td>B</td></tr>
+        <tr><td><kbd>F6</kbd></td><td>Absolute X,Y: coloca um vértice por coordenadas</td><td>B, C</td></tr>
+        <tr><td><kbd>G</kbd></td><td>Direction/Distance: próximo vértice por direção e distância</td><td>B, C</td></tr>
+        <tr><td><kbd>D</kbd></td><td>Distance: fixa o comprimento do próximo lado</td><td>B</td></tr>
+        <tr><td><kbd>P</kbd></td><td>Parallel: próximo lado paralelo à linha clicada</td><td>B</td></tr>
+        <tr><td><kbd>E</kbd></td><td>Perpendicular: próximo lado a 90° da linha clicada</td><td>B</td></tr>
+        <tr><td><kbd>F2</kbd></td><td>Finish: conclui o desenho</td><td>B, C</td></tr>
+        <tr><td><kbd>Ctrl</kbd>+<kbd>Z</kbd></td><td>Desfaz a última operação</td><td>A</td></tr>
+        <tr><td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd></td><td>Abre o painel Attributes</td><td>A, D</td></tr>
+      </table></div>
+
+      <h3>Glossário</h3>
+      <div class="tbl"><table>
+        <tr><th>Termo</th><th>Definição</th></tr>
+        <tr><td><strong>Azimute (NAz)</strong></td><td>Ângulo de 0° a 360°, medido no sentido horário a partir do Norte.</td></tr>
+        <tr><td><strong>Rumo (QB)</strong></td><td>Ângulo de 0° a 90° acompanhado do quadrante (ex.: N 14°42'37" W).</td></tr>
+        <tr><td><strong>Contra-rumo</strong></td><td>A mesma linha percorrida em sentido contrário: troca N↔S e E↔W.</td></tr>
+        <tr><td><strong>Desmembramento</strong></td><td>Divisão de um lote em dois ou mais (no Pro: Split).</td></tr>
+        <tr><td><strong>Remembramento</strong></td><td>Junção de dois ou mais lotes em um só (no Pro: Merge).</td></tr>
+        <tr><td><strong>Inscrição</strong></td><td>Código do imóvel no cadastro: setor-quadra-lote-unidade (ex.: 101-014-0355-001).</td></tr>
+        <tr><td><strong>Snapping</strong></td><td>Encaixe automático do cursor em vértices, bordas e pontos médios de feições existentes.</td></tr>
+        <tr><td><strong>Shape_Area</strong></td><td>Área calculada pelo próprio desenho, em m². Não pode ser editada.</td></tr>
+        <tr><td><strong>Testada</strong></td><td>Lado do lote voltado para a rua.</td></tr>
+        <tr><td><strong>Memorial descritivo</strong></td><td>Documento que descreve o perímetro do lote por pontos, direções e distâncias.</td></tr>
+      </table></div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ============ RODAPÉ ============ -->
+<footer class="footer">
+  <p><strong>Tutorial - Edição no ArcGIS Pro para o Cadastro | Apucarana - PR</strong></p>
+  <p style="margin-top:.8rem;">
+    📧 Email: <a href="mailto:idepplan@apucarana.pv.gov.br">idepplan@apucarana.pv.gov.br</a><br>
+    📱 Tel: (43) 3422-4000
+  </p>
+  <p style="margin-top:1rem; font-size:.85rem;">Telas: ArcGIS Pro sobre a base de treino do Centro (dados pessoais removidos). Medidas e direções calculadas a partir da geometria dos lotes de treino.</p>
+  <p style="margin-top:.4rem; font-size:.85rem;">Última atualização: 2026 | Município de Apucarana - PR</p>
+  <a href="#topo" class="back-to-top">↑ Voltar ao topo</a>
+</footer>
+
+<script>
+(function(){
+  document.querySelectorAll('.carrossel').forEach(function(c){
+    var slides=c.querySelectorAll('.slide'), dots=c.querySelectorAll('.dot'), i=0;
+    function ir(n){ i=(n+slides.length)%slides.length;
+      slides.forEach(function(s,k){s.classList.toggle('ativo',k===i)});
+      dots.forEach(function(d,k){d.classList.toggle('ativo',k===i)}); }
+    var a=c.querySelector('.ant'), p=c.querySelector('.prox');
+    if(a) a.addEventListener('click',function(){ir(i-1)});
+    if(p) p.addEventListener('click',function(){ir(i+1)});
+    dots.forEach(function(d){d.addEventListener('click',function(){ir(+d.dataset.i)})});
+  });
+  document.querySelectorAll('.controles').forEach(function(ctl){
+    var bloco=ctl.closest('section.bloco');
+    ctl.querySelector('.abrir').addEventListener('click',function(){bloco.querySelectorAll('details.passo').forEach(function(d){d.open=true})});
+    ctl.querySelector('.fechar').addEventListener('click',function(){bloco.querySelectorAll('details.passo').forEach(function(d){d.open=false})});
+  });
+  var QUIZ={"a":[
+    {p:'Você quer dividir um lote em dois. Em qual painel está a ferramenta?',o:['Create Features','Modify Features','Attributes'],c:1,e:'Dividir altera um lote que já existe — é Modify Features › Split.'},
+    {p:'Qual campo diz a quadra oficial do lote?',o:['AR_QUADRA_','A inscrição (setor-quadra-lote)','Shape_Area'],c:1,e:'A inscrição 101-014-0355-001 indica setor 101, quadra 014. AR_QUADRA_ guarda um código antigo.'},
+    {p:'Você moveu um vértice por engano e ainda não salvou. O que fazer?',o:['Clicar em Save','Clicar em Discard (ou Ctrl+Z)','Fechar o ArcGIS Pro'],c:1,e:'Discard desfaz tudo desde o último Save; Ctrl+Z desfaz só o último passo.'},
+    {p:'Para que serve marcar "Enable and disable editing from the Edit tab"?',o:['Para salvar automaticamente','Para exigir um clique em Edit antes de editar','Para mostrar os vértices'],c:1,e:'É a trava de segurança: sem clicar em Edit, ninguém altera o cadastro sem querer.'}
+  ],"b":[
+    {p:'Qual atalho faz o próximo lado ficar paralelo a uma linha existente?',o:['E','P','G'],c:1,e:'P = Parallel. E = Perpendicular. G = Direction/Distance.'},
+    {p:'O memorial diz "S 75°17\'23\\" W". Com o seletor em NAz, o que você digita?',o:['75-17-23','255-17-23','105-17-23'],c:1,e:'Rumo S…W: azimute = 180° + rumo = 255°17\'23".'},
+    {p:'Qual é o contra-rumo de N 14°42\'37\\" W?',o:['S 14°42\'37" E','N 14°42\'37" E','S 75°17\'23" W'],c:0,e:'Contra-rumo é a mesma linha percorrida ao contrário: troca N↔S e E↔W.'},
+    {p:'O desenho fechou, mas a área deu 646 m² em vez de 120 m². O que fazer?',o:['Salvar assim mesmo','Discard e refazer conferindo cada direção e distância','Mudar a área no atributo'],c:1,e:'Área diferente denuncia erro de direção ou distância. Descarte e refaça — nunca corrija só o atributo.'}
+  ],"c":[
+    {p:'Antes de apertar G para digitar a nova divisa, o que precisa estar definido?',o:['O nome da camada','O primeiro ponto da linha','A área do lote'],c:1,e:'O G sempre parte do último ponto colocado. Sem o primeiro ponto no lugar certo, a divisa sai deslocada.'},
+    {p:'Depois do Split, as duas partes ficam com qual inscrição?',o:['Cada uma recebe uma nova automaticamente','A mesma inscrição do lote original','Ficam sem inscrição'],c:1,e:'O Split copia os atributos para as duas partes. Atualizar é tarefa do técnico (Bloco D).'},
+    {p:'No Merge, aba Existing Feature, o que indica “(preserve)”?',o:['Qual lote mantém os seus atributos','Que os originais não serão apagados','Que a área será preservada'],c:0,e:'(preserve) marca o lote que continua existindo e doa os atributos ao resultado.'},
+    {p:'O lote do memorial fechou com 1.155 m², a área certa. Está garantido que o lançamento está correto?',o:['Sim, a área prova que está certo','Não: com um contra-rumo a área é a mesma, mas o lote sai espelhado'],c:1,e:'Área certa não prova posição certa. Confira também onde o lote caiu.'}
+  ],"d":[
+    {p:'Você mudou a inscrição no painel Attributes, mas o lote continua igual. O que faltou?',o:['Salvar o projeto','Clicar em Apply','Clicar em Discard'],c:1,e:'Com o Auto Apply desligado, a alteração só vai para o lote quando você clica em Apply.'},
+    {p:'O que acontece se “Use the selected records” estiver desligado no Calculate Field?',o:['Nada é calculado','O cálculo roda em todos os lotes da camada','Só o primeiro lote é calculado'],c:1,e:'Sem a seleção, o Calculate Field atualiza a camada inteira — no treino, 5.020 lotes.'},
+    {p:'Qual expressão grava a área do desenho com 2 casas decimais?',o:['math.pow(!Shape_Area!, 2)','round(!Shape_Area!, 2)','!Shape_Area! * 2'],c:1,e:'round arredonda; math.pow eleva ao quadrado; * 2 dobra a área.'},
+    {p:'A seleção de áreas divergentes trouxe um lote de condomínio. Isso prova que ele está errado?',o:['Sim, precisa ser corrigido','Não: é um ponto de partida para conferir'],c:1,e:'Em condomínios, várias inscrições dividem o mesmo polígono. A lista indica onde olhar, não o que corrigir.'}
+  ]};
+  Object.keys(QUIZ).forEach(function(k){
+    var box=document.getElementById('quiz-'+k); if(!box) return;
+    QUIZ[k].forEach(function(q,qi){
+      var d=document.createElement('div'); d.className='q';
+      var h='<p>'+(qi+1)+'. '+q.p+'</p>';
+      q.o.forEach(function(o,oi){h+='<label><input type="radio" name="'+k+qi+'" value="'+oi+'">'+o+'</label>'});
+      h+='<div class="fb"></div>'; d.innerHTML=h; box.appendChild(d);
+      d.querySelectorAll('input').forEach(function(r){r.addEventListener('change',function(){
+        var fb=d.querySelector('.fb'), ok=(+r.value===q.c);
+        fb.className='fb '+(ok?'ok':'no'); fb.textContent=(ok?'✔ Certo! ':'✘ Ainda não. ')+q.e;
+      })});
+    });
+  });
+})();
+</script>
+</body>
+</html>
